@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -209,15 +209,15 @@ SEXP rfsrcGrow(SEXP traceFlag,
     if ( RF_xSize < 2) {
       Rprintf("\nRF-SRC:  *** ERROR *** ");
       Rprintf("\nRF-SRC:  Parameter verification failed.");
-      Rprintf("\nRF-SRC:  Number of covariates must be greater than two (2) with specified split rule:  %10d \n", RF_xSize);
+      Rprintf("\nRF-SRC:  Number of covariates must be greater than or equal to two (2) with specified split rule:  %10d \n", RF_xSize);
       Rprintf("\nRF-SRC:  The application will now exit.\n");
       return R_NilValue;
     }
-    if ( ((int) (RF_randomCovariateCount - RF_randomResponseCount) < 1) || (RF_randomCovariateCount > RF_xSize) ) {
+    if ( ((int) (RF_xSize - RF_randomResponseCount) < 1) || (RF_randomCovariateCount > RF_xSize) ) {
       Rprintf("\nRF-SRC:  *** ERROR *** ");
       Rprintf("\nRF-SRC:  Parameter verification failed.");
-      Rprintf("\nRF-SRC:  Number of random covariate parameters");
-      Rprintf("\nRF-SRC:  must be within range:  %10d \n", RF_randomCovariateCount);
+      Rprintf("\nRF-SRC:  Number of random responses and random covariates parameters");
+      Rprintf("\nRF-SRC:  must be within range:  %10d %10d \n", RF_randomResponseCount,  RF_randomCovariateCount);
       Rprintf("\nRF-SRC:  The application will now exit.\n");
       return R_NilValue;
     }

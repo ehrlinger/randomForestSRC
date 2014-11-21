@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -1233,79 +1233,84 @@ uint stackVariableTerminalNodeOutputObjects(char     mode,
   uint i, j;
   if (mode == RF_GROW) {
     if (RF_opt & OPT_TREE) {
-      if (RF_optHigh & OPT_TERM) {
-        tnDimOne = 0;
-        for (i = 1; i <= RF_forestSize; i++) {
-          tnDimOne += RF_tLeafCount[i];
-        }
-        if ((RF_timeIndex > 0) && (RF_statusIndex > 0)) {
-          tnDimTwo = tnDimOne * RF_sortedTimeInterestSize;
-          PROTECT(sexpVector[RF_TN_SURV] = NEW_NUMERIC(tnDimTwo));
-          *pRF_TN_SURV = NUMERIC_POINTER(sexpVector[RF_TN_SURV]);
-          SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_SURV]);
-          SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_SURV]));
-          tnDimTwo = tnDimOne * RF_eventTypeSize;
-          PROTECT(sexpVector[RF_TN_MORT] = NEW_NUMERIC(tnDimTwo));
-          *pRF_TN_MORT = NUMERIC_POINTER(sexpVector[RF_TN_MORT]);
-          SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_MORT]);
-          SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_MORT]));
-          if (!(RF_opt & OPT_COMP_RISK)) {
+      if ((RF_opt & OPT_PERF) |
+          (RF_opt & OPT_PERF_CALB) |
+          (RF_opt & OPT_OENS) |
+          (RF_opt & OPT_FENS)) {
+        if (RF_optHigh & OPT_TERM) {
+          tnDimOne = 0;
+          for (i = 1; i <= RF_forestSize; i++) {
+            tnDimOne += RF_tLeafCount[i];
+          }
+          if ((RF_timeIndex > 0) && (RF_statusIndex > 0)) {
             tnDimTwo = tnDimOne * RF_sortedTimeInterestSize;
-            PROTECT(sexpVector[RF_TN_NLSN] = NEW_NUMERIC(tnDimTwo));
-            *pRF_TN_NLSN = NUMERIC_POINTER(sexpVector[RF_TN_NLSN]);
-            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_NLSN]);
-            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_NLSN]));
+            PROTECT(sexpVector[RF_TN_SURV] = NEW_NUMERIC(tnDimTwo));
+            *pRF_TN_SURV = NUMERIC_POINTER(sexpVector[RF_TN_SURV]);
+            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_SURV]);
+            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_SURV]));
+            tnDimTwo = tnDimOne * RF_eventTypeSize;
+            PROTECT(sexpVector[RF_TN_MORT] = NEW_NUMERIC(tnDimTwo));
+            *pRF_TN_MORT = NUMERIC_POINTER(sexpVector[RF_TN_MORT]);
+            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_MORT]);
+            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_MORT]));
+            if (!(RF_opt & OPT_COMP_RISK)) {
+              tnDimTwo = tnDimOne * RF_sortedTimeInterestSize;
+              PROTECT(sexpVector[RF_TN_NLSN] = NEW_NUMERIC(tnDimTwo));
+              *pRF_TN_NLSN = NUMERIC_POINTER(sexpVector[RF_TN_NLSN]);
+              SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_NLSN]);
+              SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_NLSN]));
+            }
+            else {
+              tnDimTwo = tnDimOne * RF_eventTypeSize * RF_sortedTimeInterestSize;
+              PROTECT(sexpVector[RF_TN_CSHZ] = NEW_NUMERIC(tnDimTwo));
+              PROTECT(sexpVector[RF_TN_CIFN] = NEW_NUMERIC(tnDimTwo));
+              *pRF_TN_CSHZ = NUMERIC_POINTER(sexpVector[RF_TN_CSHZ]);
+              *pRF_TN_CIFN = NUMERIC_POINTER(sexpVector[RF_TN_CIFN]);
+              SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_CSHZ]);
+              SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_CSHZ]));
+              SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_CIFN]);
+              SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_CIFN]));
+            }
           }
           else {
-            tnDimTwo = tnDimOne * RF_eventTypeSize * RF_sortedTimeInterestSize;
-            PROTECT(sexpVector[RF_TN_CSHZ] = NEW_NUMERIC(tnDimTwo));
-            PROTECT(sexpVector[RF_TN_CIFN] = NEW_NUMERIC(tnDimTwo));
-            *pRF_TN_CSHZ = NUMERIC_POINTER(sexpVector[RF_TN_CSHZ]);
-            *pRF_TN_CIFN = NUMERIC_POINTER(sexpVector[RF_TN_CIFN]);
-            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_CSHZ]);
-            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_CSHZ]));
-            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_CIFN]);
-            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_CIFN]));
-          }
-        }
-        else {
-          if (RF_rNonFactorCount > 0) {
-            tnDimTwo = tnDimOne * RF_rNonFactorCount;
-            PROTECT(sexpVector[RF_TN_REGR] = NEW_NUMERIC(tnDimTwo));
-            *pRF_TN_REGR = NUMERIC_POINTER(sexpVector[RF_TN_REGR]);
-            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_REGR]);
-            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_REGR]));
-          }
-          if (RF_rFactorCount > 0) {
-            tnDimTwo = 0;
-            for (j = 1; j <= RF_rFactorCount; j++) {
-              tnDimTwo += RF_rFactorSize[j];
+            if (RF_rNonFactorCount > 0) {
+              tnDimTwo = tnDimOne * RF_rNonFactorCount;
+              PROTECT(sexpVector[RF_TN_REGR] = NEW_NUMERIC(tnDimTwo));
+              *pRF_TN_REGR = NUMERIC_POINTER(sexpVector[RF_TN_REGR]);
+              SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_REGR]);
+              SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_REGR]));
             }
-            tnDimTwo = tnDimOne * tnDimTwo;
-            PROTECT(sexpVector[RF_TN_CLAS] = NEW_INTEGER(tnDimTwo));
-            *pRF_TN_CLAS = (uint*) INTEGER_POINTER(sexpVector[RF_TN_CLAS]);
-            SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_CLAS]);
-            SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_CLAS]));
+            if (RF_rFactorCount > 0) {
+              tnDimTwo = 0;
+              for (j = 1; j <= RF_rFactorCount; j++) {
+                tnDimTwo += RF_rFactorSize[j];
+              }
+              tnDimTwo = tnDimOne * tnDimTwo;
+              PROTECT(sexpVector[RF_TN_CLAS] = NEW_INTEGER(tnDimTwo));
+              *pRF_TN_CLAS = (uint*) INTEGER_POINTER(sexpVector[RF_TN_CLAS]);
+              SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_CLAS]);
+              SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_CLAS]));
+            }
           }
+          PROTECT(sexpVector[RF_TN_MCNT] = NEW_INTEGER(tnDimOne));
+          *pRF_TN_MCNT = (uint*) INTEGER_POINTER(sexpVector[RF_TN_MCNT]);
+          SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_MCNT]);
+          SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_MCNT]));
+          PROTECT(sexpVector[RF_TN_MEMB] = NEW_INTEGER(RF_forestSize * RF_observationSize));
+          *pRF_TN_MEMB = (uint*) INTEGER_POINTER(sexpVector[RF_TN_MEMB]);
+          SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_MEMB]);
+          SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_MEMB]));
+          stackAuxVariableTerminalNodeOutputObjects(mode,
+                                                    *pRF_TN_SURV,
+                                                    *pRF_TN_MORT,
+                                                    *pRF_TN_NLSN,
+                                                    *pRF_TN_CSHZ,
+                                                    *pRF_TN_CIFN,
+                                                    *pRF_TN_REGR,
+                                                    *pRF_TN_CLAS,
+                                                    *pRF_TN_MCNT,
+                                                    *pRF_TN_MEMB);
         }
-        PROTECT(sexpVector[RF_TN_MCNT] = NEW_INTEGER(tnDimOne));
-        *pRF_TN_MCNT = (uint*) INTEGER_POINTER(sexpVector[RF_TN_MCNT]);
-        SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_MCNT]);
-        SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_MCNT]));
-        PROTECT(sexpVector[RF_TN_MEMB] = NEW_INTEGER(RF_forestSize * RF_observationSize));
-        *pRF_TN_MEMB = (uint*) INTEGER_POINTER(sexpVector[RF_TN_MEMB]);
-        SET_VECTOR_ELT(sexpVector[RF_OUTP_ID], sexpIndex, sexpVector[RF_TN_MEMB]);
-        SET_STRING_ELT(sexpVector[RF_STRG_ID], sexpIndex++, mkChar(sexpString[RF_TN_MEMB]));
-        stackAuxVariableTerminalNodeOutputObjects(mode,
-                                                  *pRF_TN_SURV,
-                                                  *pRF_TN_MORT,
-                                                  *pRF_TN_NLSN,
-                                                  *pRF_TN_CSHZ,
-                                                  *pRF_TN_CIFN,
-                                                  *pRF_TN_REGR,
-                                                  *pRF_TN_CLAS,
-                                                  *pRF_TN_MCNT,
-                                                  *pRF_TN_MEMB);
       }
     }
   }

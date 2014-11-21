@@ -121,11 +121,16 @@ rfsrc(formula, data, ntree = 1000,
     \item{nimpute}{Number of iterations of the missing data algorithm.
 	  Performance measures such as out-of-bag (OOB) error rates tend
 	  to become optimistic if \code{nimpute} is greater than 1.}
-    \item{ntime}{Integer value which for survival families
-      constrains ensemble calculations to a grid of time values of no
-      more than \code{ntime} time points.  The default is to use all
-      observed event times.  Use this option when the sample size is
-      large to improve computational efficiency.}
+     \item{ntime}{Integer value used for survival families to
+      constrain ensemble calculations to a grid of time values of no
+      more than \code{ntime} time points.  Alternatively if a vector of
+      values of length greater than one is supplied, it is assumed these
+      are the time points to be used to constrain the calculations (note
+      that the constrained time points used will be the observed event
+      times closest to the user supplied time points).  If no value is
+      specified, the default action is to use all observed event times.
+      Use this option when the sample size is large to improve
+      computational efficiency.}
     \item{cause}{Integer value between 1 and \code{J} indicating
 	  the event of interest for competing risks, where \code{J} is
 	  the number of event types (this option applies only to
@@ -176,7 +181,7 @@ rfsrc(formula, data, ntree = 1000,
  \item{fast.restore}{Should forest restoration be fast?  Be aware that
 	  this option uses significantly more RAM and may not be
 	  suitable for all platforms depending on the size of the data
-	  set bing analyzed.}
+	  set being analyzed.}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
@@ -358,7 +363,7 @@ rfsrc(formula, data, ntree = 1000,
   version of the missing data algorithm but which should be
   computationally faster.  Unlike the default method, data is
   not imputed as the tree is grown, instead tree nodes are split using
-  non-missing in-bag data and following the split to a node, data points
+  non-missing in-bag data.  Following the split to a node, data points
   with missing values on the variable used to split the node are
   randomly assigned to daughter nodes.  When terminal nodes are reached,
   missing data are imputed as before by using out-of-bag (OOB)

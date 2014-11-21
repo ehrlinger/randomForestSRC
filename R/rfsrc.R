@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 1.5.5.3
+####  Version 1.6
 ####
 ####  Copyright 2012, University of Miami
 ####
@@ -140,6 +140,8 @@ rfsrc <- function(formula,
   xfactor <- extract.factor(data, xvar.names)
   yvar.types <- get.yvar.type(fmly, data[, yvar.names, drop = FALSE])
   data <- finalizeData(c(yvar.names, xvar.names), data, na.action, miss.flag)
+  data.row.names <- rownames(data)
+  data.col.names <- colnames(data)
   xvar <- as.matrix(data[, xvar.names])
   rownames(xvar) <- colnames(xvar) <- NULL
   split.wt <- NULL
@@ -147,8 +149,8 @@ rfsrc <- function(formula,
   n <- nrow(xvar)
   n.xvar <- ncol(xvar)
   mtry <- get.grow.mtry(mtry, n.xvar, fmly)
-  xvar.wt  <- get.grow.x.wt(xvar.wt, n.xvar)
-  split.wt <- get.grow.x.wt(split.wt, n.xvar)
+  xvar.wt  <- get.grow.xvar.wt(xvar.wt, n.xvar)
+  split.wt <- get.grow.split.wt(split.wt, n.xvar)
   forest.wt <- match.arg(as.character(forest.wt), c(FALSE, TRUE, "inbag", "oob", "all"))
   yvar <- as.matrix(data[, yvar.names, drop = FALSE])
   if(dim(yvar)[2] == 0) {
@@ -241,7 +243,7 @@ rfsrc <- function(formula,
   forest.wt.bits <- get.forest.wt(TRUE, bootstrap, forest.wt)
   na.action.bits <- get.na.action(na.action)
   do.trace <- get.trace(do.trace)
-  nativeOutput <- .Call("rfsrcGrow",
+  nativeOutput <- tryCatch({.Call("rfsrcGrow",
                         as.integer(do.trace),
                         as.integer(seed),
                         as.integer(impute.only.bits +
@@ -281,26 +283,30 @@ rfsrc <- function(formula,
                         as.double(event.info$time.interest),
                         as.double(miss.tree),
                         as.integer(nimpute),
-                        as.integer(get.rf.cores()))
-  if(is.null(nativeOutput)) {
-    stop("Error occurred in algorithm.  Please turn trace on for further analysis.")
+                        as.integer(get.rf.cores()))}, error = function(e) {NULL})
+  if (is.null(nativeOutput)) {
+    if (impute.only) {
+      return(NULL)
+    }
+    else {
+      stop("An error has occurred in the grow algorithm.  Please turn trace on for further analysis.")
+    }
   }
   if (n.miss > 0) {
     imputed.data <- matrix(nativeOutput$imputation, nrow = n.miss, byrow = FALSE)
     imputed.indv <- imputed.data[, 1]
-    imputed.data <- as.matrix(imputed.data[, -1])
-    if (n.miss == 1) imputed.data <- t(imputed.data)
+    imputed.data <- as.matrix(imputed.data[, -1, drop = FALSE])
     nativeOutput$imputation <- NULL
     if (nimpute > 1) {
       if (grepl("surv", fmly)) {
         yvar[imputed.indv, 1] <- imputed.data[, 1]
         yvar[imputed.indv, 2] <- imputed.data[, 2]
-        xvar[imputed.indv, ] <- imputed.data[, -c(1:2)]
+        xvar[imputed.indv, ] <- imputed.data[, -c(1:2), drop = FALSE]
       }
       else {
         if (!is.null(yvar.types)) {
-          yvar[imputed.indv, ] <- imputed.data[, length(yvar.types)]
-          xvar[imputed.indv, ] <- imputed.data[, -c(1:length(yvar.types))]
+          yvar[imputed.indv, ] <- imputed.data[, length(yvar.types), drop = FALSE]
+          xvar[imputed.indv, ] <- imputed.data[, -c(1:length(yvar.types)), drop = FALSE]
         }
         else {
           xvar[imputed.indv, ] <- imputed.data
@@ -309,6 +315,7 @@ rfsrc <- function(formula,
       imputed.indv <- NULL
       imputed.data <- NULL
       imputedOOBData <- NULL
+      na.action = "na.omit"
     }
     else {
       colnames(imputed.data) <- c(yvar.names, xvar.names)
@@ -316,6 +323,7 @@ rfsrc <- function(formula,
     }
   }
   xvar <- as.data.frame(xvar)
+  rownames(xvar) <- data.row.names
   colnames(xvar) <- xvar.names
   xvar <- map.factor(xvar, xfactor)
   if (fmly != "unsupv") {
@@ -360,7 +368,9 @@ rfsrc <- function(formula,
                        bootstrap.bits = bootstrap.bits,
                        bootstrap = bootstrap,
                        fast.restore.bits = fast.restore.bits,
-                       nativeArrayTNDS = nativeArrayTNDS)
+                       nativeArrayTNDS = nativeArrayTNDS,
+                       version = 1.6,
+                       na.action = na.action)
     if (grepl("surv", fmly)) {
       forest.out$time.interest <- event.info$time.interest
     }

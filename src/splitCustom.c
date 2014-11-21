@@ -60,25 +60,42 @@
 ////**********************************************************************
 
 
-#ifndef RSFCLASS_H
-#define RSFCLASS_H
-#include "node.h"
-void getMultiClassProb (uint treeID);
-void updateMultiClassProb (uint mode, uint treeID, double *ensemblePredictor);
-void updateEnsembleMultiClass(uint mode, uint treeID, double  *ensembleOutcome);
-double getBrierScore(uint     obsSize,
-                     double  *responsePtr,
-                     double **ensemblePtr,
-                     uint    *denomPtr,
-                     double  *condPerformance);
-void getConditionalClassificationIndex(uint    size,
-                                       double *responsePtr,
-                                       double *predictedOutcome,
-                                       uint   *oobCount,
-                                       double *condPerformance);
-double getClassificationIndex(uint    size,
-                              double *responsePtr,
-                              double *predictedOutcome,
-                              uint   *oobCount);
-void restoreMultiClassProb(uint treeID);
-#endif
+#include        "global.h"
+#include        "extern.h"
+#include         "trace.h"
+#include        "nrutil.h"
+#include     "factorOps.h"
+#include     "splitUtil.h"
+#include    "regression.h"
+#include   "splitCustom.h"
+double getCustomSplitStatistic (uint    n,
+                                char   *membership,
+                                double *time,
+                                double *event,
+                                double *response,
+                                double  mean,
+                                double  variance)
+{
+  double sumLeftSqr, sumRghtSqr;
+  double delta;
+  double sumLeft, sumRght;
+  unsigned int leftSize, rghtSize;
+  unsigned int j;
+  sumLeft = sumRght = 0.0;
+  leftSize = rghtSize = 0;
+  delta = 0.0;
+  for (j = 1; j <= n; j++) {
+    if (membership[j] == LEFT) {
+      sumLeft += response[j] - mean;
+      leftSize ++;
+    }
+    else {
+      sumRght += response[j] - mean;
+      rghtSize ++;
+    }
+  }
+  sumLeftSqr = pow(sumLeft, 2.0) / ((double) leftSize * variance);
+  sumRghtSqr = pow(sumRght, 2.0) / ((double) rghtSize * variance);
+  delta += sumLeftSqr + sumRghtSqr;
+  return delta;
+}

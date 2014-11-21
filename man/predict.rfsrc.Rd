@@ -116,8 +116,8 @@
        growing the forest.}
      \item{imputed.indv}{Vector of indices of records in test data with
          missing values.}
-     \item{imputed.data}{Data frame comprising imputed test data.  First
-       columns are the y-outcomes.}
+     \item{imputed.data}{Data frame comprising imputed test data.  The first
+       columns are the y-outcomes followed by the x-variables.}
      \item{split.depth}{Matrix [i][j] or array [i][j][k] recording the
      minimal depth for variable [j] for case [i], either averaged over
      the forest, or by tree [k].}

@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -233,7 +233,7 @@ void getRandomMembership (uint       mode,
 void getPermuteMembership (uint       mode,
                            uint       treeID,
                            Terminal **vimpMembership,
-                           uint      p) {
+                           uint       p) {
   Node    *rootPtr;
   uint     obsSize;
   double **predictorPtr;
@@ -358,7 +358,7 @@ void getPermuteMembership (uint       mode,
   free_uivector(indexVIMP, 1, permuteObsSize + 1);
   free_uivector(permuteVIMP, 1, permuteObsSize + 1);
 }
- void getVimpMembership (uint mode, uint treeID, Terminal **vimpMembership, uint p) {
+void getVimpMembership (uint mode, uint treeID, Terminal **vimpMembership, uint p) {
   char result;
   if (!(RF_opt & OPT_VIMP)) {
     Rprintf("\nRF-SRC:  *** ERROR *** ");
@@ -460,56 +460,56 @@ void updateGenericVimpEnsemble (uint       mode,
     break;
   }
   ensembleDim = getEnsembleDim();
-    for (i=1; i <= obsSize; i++) {
-      if (membershipFlag[i] == selectionFlag) {
-        terminalNode = noiseMembership[i];
-        if (!ISNA(terminalNode -> predictedOutcome)) {
-          if (!ensembleFlag) {
-            genOutcome[targetIndex][i] = terminalNode -> predictedOutcome;
-            RF_vimpEnsembleDen[targetIndex][i] = 1;
-          }
-          else {
+  for (i=1; i <= obsSize; i++) {
+    if (membershipFlag[i] == selectionFlag) {
+      terminalNode = noiseMembership[i];
+      if (!ISNA(terminalNode -> predictedOutcome)) {
+        if (!ensembleFlag) {
+          genOutcome[targetIndex][i] = terminalNode -> predictedOutcome;
+          RF_vimpEnsembleDen[targetIndex][i] = 1;
+        }
+        else {
             genOutcome[targetIndex][i] += terminalNode -> predictedOutcome;
             RF_vimpEnsembleDen[targetIndex][i] ++;
-          }
-          if ((RF_timeIndex > 0) && (RF_statusIndex > 0)) {
-            for (j=1; j <= ensembleDim; j++) {
-              if (!ensembleFlag) {
-                sGenOutcome[targetIndex][j][i] = terminalNode -> mortality[j];
-              }
-              else {
-                sGenOutcome[targetIndex][j][i] += terminalNode -> mortality[j];
-              }
+        }
+        if ((RF_timeIndex > 0) && (RF_statusIndex > 0)) {
+          for (j=1; j <= ensembleDim; j++) {
+            if (!ensembleFlag) {
+              sGenOutcome[targetIndex][j][i] = terminalNode -> mortality[j];
             }
-          }
-          else {
-            if (strcmp(RF_rType[RF_rTarget], "C") == 0) {
-              for (j=1; j<= ensembleDim; j++) {
-                if (!ensembleFlag) {
-                  mcGenEnsemble[targetIndex][j][i] = (double) (terminalNode -> multiClassProb)[RF_rFactorMap[RF_rTarget]][j] / (double) (terminalNode -> membrCount);
-                }
-                else {
-                  mcGenEnsemble[targetIndex][j][i] += (double) (terminalNode -> multiClassProb)[RF_rFactorMap[RF_rTarget]][j] / (double) (terminalNode -> membrCount);
-                }
-              }
+            else {
+                sGenOutcome[targetIndex][j][i] += terminalNode -> mortality[j];
             }
           }
         }
         else {
-          if (!(RF_opt & OPT_OUTC_TYPE)) {
-            Rprintf("\nRF-SRC:  *** ERROR *** ");
-            Rprintf("\nRF-SRC:  NA encountered for VIMP outcome in terminal node:  %10d", terminalNode -> nodeID);
-            Rprintf("\nRF-SRC:  Please Contact Technical Support.");
-            error("\nRF-SRC:  The application will now exit.\n");
+          if (strcmp(RF_rType[RF_rTarget], "C") == 0) {
+            for (j=1; j<= ensembleDim; j++) {
+              if (!ensembleFlag) {
+                mcGenEnsemble[targetIndex][j][i] = (double) (terminalNode -> multiClassProb)[RF_rFactorMap[RF_rTarget]][j] / (double) (terminalNode -> membrCount);
+              }
+              else {
+                  mcGenEnsemble[targetIndex][j][i] += (double) (terminalNode -> multiClassProb)[RF_rFactorMap[RF_rTarget]][j] / (double) (terminalNode -> membrCount);
+              }
+            }
           }
         }
       }
       else {
-        if (!ensembleFlag) {
-          RF_vimpEnsembleDen[targetIndex][i] = 0;
+        if (!(RF_opt & OPT_OUTC_TYPE)) {
+          Rprintf("\nRF-SRC:  *** ERROR *** ");
+          Rprintf("\nRF-SRC:  NA encountered for VIMP outcome in terminal node:  %10d", terminalNode -> nodeID);
+          Rprintf("\nRF-SRC:  Please Contact Technical Support.");
+          error("\nRF-SRC:  The application will now exit.\n");
         }
       }
-    }  
+    }
+    else {
+      if (!ensembleFlag) {
+        RF_vimpEnsembleDen[targetIndex][i] = 0;
+      }
+    }
+  }  
 }
 void summarizeVimpPerformance(uint       mode,
                               uint       treeID,
@@ -830,7 +830,12 @@ void updateVimpCalculations (uint mode, uint b, uint intrIndex, Terminal **vimpM
     Rprintf("\nRF-SRC:  Please Contact Technical Support.");
     error("\nRF-SRC:  The application will now exit.\n");
   }
-  updateVimpEnsemble(mode, b, vimpMembership, intrIndex);
+#ifdef SUPPORT_OPENMP
+#pragma omp critical (_update_gve)
+#endif
+  {  
+    updateVimpEnsemble(mode, b, vimpMembership, intrIndex);
+  }  
   if (RF_opt & OPT_VIMP_LEOB) {
     summarizeVimpPerformance(mode, b, intrIndex);
   }

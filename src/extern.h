@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -236,7 +236,6 @@ extern double ***RF_splitDepthPtr;
 extern uint    *RF_serialTreeIndex;
 extern uint     RF_serialTreeCount;
 extern char    **RF_dmRecordBootFlag;
-extern double ***RF_dmvImputation;
 extern double **RF_performancePtr;
 extern uint   **RF_varUsedPtr;
 extern uint    *RF_oobSize;

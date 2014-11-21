@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -215,7 +215,8 @@ void stackIncomingArrays(uint mode) {
           (RF_splitRule != CLAS_WT_HVY) &&
           (RF_splitRule != MVRG_SPLIT)  &&
           (RF_splitRule != MVCL_SPLIT)  &&
-          (RF_splitRule != USPV_SPLIT)) {
+          (RF_splitRule != USPV_SPLIT)  &&
+          (RF_splitRule != CUST_SPLIT)) {
         Rprintf("\nRF-SRC:  *** ERROR *** ");
         Rprintf("\nRF-SRC:  !SURV data and split rule specified are incompatible.");
         Rprintf("\nRF-SRC:  Please Contact Technical Support.");
@@ -227,7 +228,8 @@ void stackIncomingArrays(uint mode) {
           (RF_splitRule != SURV_CR_LOG) &&
           (RF_splitRule != SURV_LRSCR)  &&
           (RF_splitRule != SURV_CR_LAU) &&
-          (RF_splitRule != RAND_SPLIT)) {
+          (RF_splitRule != RAND_SPLIT)  &&
+          (RF_splitRule != CUST_SPLIT)) {
         Rprintf("\nRF-SRC:  *** ERROR *** ");
         Rprintf("\nRF-SRC:  SURV data and split rule specified are incompatible.");
         Rprintf("\nRF-SRC:  Please Contact Technical Support.");

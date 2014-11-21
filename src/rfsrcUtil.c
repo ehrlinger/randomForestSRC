@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -112,10 +112,10 @@ void updateTerminalNodeOutcomes (uint b) {
       }  
     }
     else {
-      if (strcmp(RF_rType[RF_rTarget], "C") == 0) {
+      if(RF_rFactorCount > 0) {
         getMultiClassProb(b);
       }
-      else {
+      if(RF_rNonFactorCount > 0) {
         getMeanResponse(b);
       }
     }
@@ -138,10 +138,10 @@ void restoreTerminalNodeOutcomes (uint b) {
       }  
     }
     else {
-      if (strcmp(RF_rType[RF_rTarget], "C") == 0) {
+      if(RF_rFactorCount > 0) {
         restoreMultiClassProb(b);
       }
-      else {
+      if(RF_rNonFactorCount > 0) {
         restoreMeanResponse(b);
       }
     }
@@ -183,11 +183,16 @@ void updateEnsembleCalculations (char      multipleImputeFlag,
   ensembleDenPtr       = NULL;  
   denominatorCopy      = NULL;  
   thisSerialTreeCount  = 0;     
-  if ((mode == RF_GROW) || !(RF_optHigh & OPT_TERM)) {
+  if (mode == RF_GROW) {
     updateTerminalNodeOutcomes(b);
   }
   else {
-    restoreTerminalNodeOutcomes(b);
+    if(!(RF_optHigh & OPT_TERM)) {
+      updateTerminalNodeOutcomes(b);
+    }
+    else {
+      restoreTerminalNodeOutcomes(b);
+    }
   }
   if (RF_tLeafCount[b] > 0) {
     switch (mode) {
@@ -308,28 +313,7 @@ void updateEnsembleCalculations (char      multipleImputeFlag,
             freeTerminalNodeSurvivalStructuresNonVimp(RF_tTermList[b][j]);
           }
         }
-        if (!(RF_opt & OPT_VIMP) && !(RF_optHigh & OPT_TERM)) {
-          for (j = 1; j <= RF_tLeafCount[b]; j++) {
-            freeTerminalNodeSurvivalStructuresFinal(RF_tTermList[b][j]);
-          }
-        }
-      }
-      else {
-        if (!(RF_opt & OPT_VIMP) && !(RF_optHigh & OPT_TERM)) {
-          for (j = 1; j <= RF_tLeafCount[b]; j++) {
-            freeTerminalNodeNonSurvivalStructures(RF_tTermList[b][j]);
-          }
-        }
-      }
-    }
-    else {
-      if ((RF_timeIndex > 0) && (RF_statusIndex > 0)) {
-        if (!(RF_optHigh & OPT_TERM)) {
-          for (j = 1; j <= RF_tLeafCount[b]; j++) {
-            freeTerminalNodeSurvivalStructuresNonVimp(RF_tTermList[b][j]);
-          }
-        }
-        if (!(RF_opt & OPT_VIMP)) { 
+        if (!(RF_opt & OPT_VIMP)) {
           if (!(RF_optHigh & OPT_TERM)) {
             for (j = 1; j <= RF_tLeafCount[b]; j++) {
               freeTerminalNodeSurvivalStructuresFinal(RF_tTermList[b][j]);
@@ -343,6 +327,25 @@ void updateEnsembleCalculations (char      multipleImputeFlag,
             for (j = 1; j <= RF_tLeafCount[b]; j++) {
               freeTerminalNodeNonSurvivalStructures(RF_tTermList[b][j]);
             }
+          }
+        }
+      }
+    }
+    else {
+      if ((RF_timeIndex > 0) && (RF_statusIndex > 0)) {
+        for (j = 1; j <= RF_tLeafCount[b]; j++) {
+          freeTerminalNodeSurvivalStructuresNonVimp(RF_tTermList[b][j]);
+        }
+        if (!(RF_opt & OPT_VIMP)) {
+          for (j = 1; j <= RF_tLeafCount[b]; j++) {
+            freeTerminalNodeSurvivalStructuresFinal(RF_tTermList[b][j]);
+          }
+        }
+      }
+      else {
+        if (!(RF_opt & OPT_VIMP)) {
+          for (j = 1; j <= RF_tLeafCount[b]; j++) {
+            freeTerminalNodeNonSurvivalStructures(RF_tTermList[b][j]);
           }
         }
       }

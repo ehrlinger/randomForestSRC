@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -91,7 +91,7 @@
 #define LEFT      0x01
 #define RIGHT     0x00
 #define NEITHER   0x03
-#define EPSILON 1.0e-7
+#define EPSILON 1.0e-9
 #define OPT_FENS       0x000001  
 #define OPT_OENS       0x000002  
 #define OPT_PERF       0x000004  
@@ -184,7 +184,8 @@
 #define USPV_SPLIT  12
 #define MVRG_SPLIT  13 
 #define MVCL_SPLIT  14 
-#define MAXM_SPLIT  14 
+#define CUST_SPLIT  15
+#define MAXM_SPLIT  15 
 #define APROX 0
 #define EXACT 1
 #define SIZE_OF_INTEGER sizeof(uint)

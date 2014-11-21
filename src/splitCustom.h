@@ -60,25 +60,14 @@
 ////**********************************************************************
 
 
-#ifndef RSFCLASS_H
-#define RSFCLASS_H
+#ifndef RSFSPLITCUST_H
+#define RSFSPLITCUST_H
 #include "node.h"
-void getMultiClassProb (uint treeID);
-void updateMultiClassProb (uint mode, uint treeID, double *ensemblePredictor);
-void updateEnsembleMultiClass(uint mode, uint treeID, double  *ensembleOutcome);
-double getBrierScore(uint     obsSize,
-                     double  *responsePtr,
-                     double **ensemblePtr,
-                     uint    *denomPtr,
-                     double  *condPerformance);
-void getConditionalClassificationIndex(uint    size,
-                                       double *responsePtr,
-                                       double *predictedOutcome,
-                                       uint   *oobCount,
-                                       double *condPerformance);
-double getClassificationIndex(uint    size,
-                              double *responsePtr,
-                              double *predictedOutcome,
-                              uint   *oobCount);
-void restoreMultiClassProb(uint treeID);
+double getCustomSplitStatistic (uint    n,
+                                char   *membership,
+                                double *time,
+                                double *event,
+                                double *response,
+                                double  mean,
+                                double  variance);
 #endif

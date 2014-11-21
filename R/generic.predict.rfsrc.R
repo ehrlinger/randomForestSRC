@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 1.5.5.3
+####  Version 1.6
 ####
 ####  Copyright 2012, University of Miami
 ####
@@ -141,6 +141,9 @@ generic.predict.rfsrc <-
       big.data <- FALSE
     }
   }
+  if (object$version != 1.6) {
+    stop("this function only works with objects created with this version of the package")
+  }
   outcome.target <- get.outcome.target(object$family, outcome.target)
   yvar.types <- get.yvar.type(object$family, object$yvar)
   yvar.target <- get.yvar.target(object$family, yvar.types, outcome.target)
@@ -232,6 +235,7 @@ generic.predict.rfsrc <-
       newdata <- finalizeData(fnames, newdata, na.action)
       xvar.newdata  <- as.matrix(newdata[, object$xvar.names, drop = FALSE])
       n.newdata <- nrow(newdata)
+      newdata.row.names <- rownames(xvar.newdata)
       if (yvar.present) {
         yvar.newdata <- as.matrix(newdata[, object$yvar.names, drop = FALSE])
         event.info.newdata <- get.grow.event.info(yvar.newdata, object.family, need.deaths = FALSE)
@@ -311,6 +315,11 @@ generic.predict.rfsrc <-
   membership.bits <-  get.membership(membership)
   statistics.bits <- get.statistics(statistics)
   forest.wt.bits <- get.forest.wt(restore.only, object$bootstrap, forest.wt)
+  if (outcome == "test") {
+  }
+  else {
+    na.action = object$na.action
+  }
   na.action.bits <- get.na.action(na.action)
   if (missing(subset) | is.null(subset)) {
     subset <- NULL
@@ -325,7 +334,7 @@ generic.predict.rfsrc <-
     }
   }
   do.trace <- get.trace(do.trace)
-  nativeOutput <- .Call("rfsrcPredict",
+  nativeOutput <- tryCatch({.Call("rfsrcPredict",
                         as.integer(do.trace),
                         as.integer(seed),
                         as.integer(restore.only.bits +
@@ -382,9 +391,9 @@ generic.predict.rfsrc <-
                         as.integer(length(importance.xvar.idx)),
                         as.integer(importance.xvar.idx),
                         as.integer(ptn.count),
-                        as.integer(get.rf.cores()))
-  if(is.null(nativeOutput)) {
-    stop("Error occurred in algorithm.  Please turn trace on for further analysis.")
+                        as.integer(get.rf.cores()))}, error = function(e) {NULL})
+  if (is.null(nativeOutput)) {
+    stop("An error has occurred in prediction.  Please turn trace on for further analysis.")
   }
   if (restore.only) {
     n.miss <- get.nmiss(xvar, yvar)
@@ -406,6 +415,7 @@ generic.predict.rfsrc <-
   }
   if ((!partial.class) & (!restore.only | outcome == "test")) {
     xvar.newdata <- as.data.frame(xvar.newdata)
+    rownames(xvar.newdata) <- newdata.row.names
     colnames(xvar.newdata) <- object$xvar.names
     xvar.newdata <- map.factor(xvar.newdata, xfactor)
     if (perf.flag) {

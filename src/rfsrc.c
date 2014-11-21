@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -313,7 +313,6 @@ double ***RF_splitDepthPtr;
 uint    *RF_serialTreeIndex;
 uint     RF_serialTreeCount;
 char    **RF_dmRecordBootFlag;
-double ***RF_dmvImputation;
 double **RF_performancePtr;
 uint   **RF_varUsedPtr;
 uint    *RF_oobSize;
@@ -366,7 +365,7 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
   uint  *mwcpPtr;
   uint   totalMWCPCount;
   uint i, j, r;
-  int vimpCount, intrIndex, b, p;
+  int vimpCount, b, p;
   uint seedValueLC;
   totalMWCPCount = 0; 
   if (RF_nImpute < 1) {
@@ -611,6 +610,27 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
       RF_serialTreeIndex[b] = 0;
     }
     RF_serialTreeCount = 0;
+    if (r == RF_nImpute) {
+      if (mode != RF_GROW) {
+        if ((RF_opt & OPT_PERF) |
+            (RF_opt & OPT_PERF_CALB) |
+            (RF_opt & OPT_OENS) |
+            (RF_opt & OPT_FENS)) {
+          if (RF_optHigh & OPT_TERM) {
+            stackAuxVariableTerminalNodeOutputObjects(mode,
+                                                      RF_TN_SURV_,         
+                                                      RF_TN_MORT_,         
+                                                      RF_TN_NLSN_,         
+                                                      RF_TN_CSHZ_,         
+                                                      RF_TN_CIFN_,         
+                                                      RF_TN_REGR_,         
+                                                      RF_TN_CLAS_,         
+                                                      RF_TN_MCNT_,         
+                                                      RF_TN_MEMB_);        
+          }
+        }
+      }
+    }  
     if (RF_numThreads > 0) {
 #ifdef SUPPORT_OPENMP
 #pragma omp parallel for num_threads(RF_numThreads)
@@ -652,80 +672,8 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
       }
     }  
     if (r == RF_nImpute) {
-        if ((RF_opt & OPT_PERF) |
-            (RF_opt & OPT_PERF_CALB) |
-            (RF_opt & OPT_OENS) |
-            (RF_opt & OPT_FENS)) {
-          char multipleImputeFlag;
-          multipleImputeFlag = FALSE;
-          if (mode == RF_GROW) {
-            if (r > 1) {
-              multipleImputeFlag = TRUE;
-            }
-          }
-          if (mode != RF_GROW) {
-            if (RF_optHigh & OPT_TERM) {
-              stackAuxVariableTerminalNodeOutputObjects(mode,
-                                                        RF_TN_SURV_,         
-                                                        RF_TN_MORT_,         
-                                                        RF_TN_NLSN_,         
-                                                        RF_TN_CSHZ_,         
-                                                        RF_TN_CIFN_,         
-                                                        RF_TN_REGR_,         
-                                                        RF_TN_CLAS_,         
-                                                        RF_TN_MCNT_,         
-                                                        RF_TN_MEMB_);        
-            }
-          }
-          if (RF_numThreads > 0) {
-#ifdef SUPPORT_OPENMP
-#pragma omp parallel for num_threads(RF_numThreads)
-#endif
-            for (b = 1; b <= RF_forestSize; b++) {
-              updateEnsembleCalculations(multipleImputeFlag, mode, b);
-            }
-          }
-          else {
-            for (b = 1; b <= RF_forestSize; b++) {
-              updateEnsembleCalculations(multipleImputeFlag, mode, b);
-            }
-          }
-        }
-    }  
-    if (r == RF_nImpute) {
       if (RF_optHigh & OPT_WGHT) {
         getWeight(mode);
-      }
-      if (RF_opt & OPT_VIMP) {
-        if (RF_opt & OPT_VIMP_JOIN) {
-          vimpCount = 1;
-        }
-        else {
-          vimpCount = RF_intrPredictorSize;
-        }
-          if (RF_numThreads > 0) {
-#ifdef SUPPORT_OPENMP
-#pragma omp parallel for num_threads(RF_numThreads)
-#endif
-            for (intrIndex = 1; intrIndex <= vimpCount; intrIndex++) {
-              for (uint bb = 1; bb <= RF_forestSize; bb++) {
-                if (RF_tLeafCount[bb] > 0) {
-                  updateVimpCalculations(mode, bb, intrIndex, RF_vimpMembership[intrIndex][bb]);
-                  unstackVimpMembership(mode, RF_vimpMembership[intrIndex][bb]);
-                }
-              }
-            }
-          }
-          else {
-            for (intrIndex = 1; intrIndex <= vimpCount; intrIndex++) {
-              for (uint bb = 1; bb <= RF_forestSize; bb++) {
-                if (RF_tLeafCount[bb] > 0) {
-                  updateVimpCalculations(mode, bb, intrIndex, RF_vimpMembership[intrIndex][bb]);
-                  unstackVimpMembership(mode, RF_vimpMembership[intrIndex][bb]);
-                }
-              }
-            }
-          }
       }
     }  
     if (RF_opt & OPT_MISS) {
@@ -949,7 +897,14 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
   }
   if (mode == RF_GROW) {
     if (RF_opt & OPT_TREE) {
-      unstackAuxVariableTerminalNodeOutputObjects(mode);
+      if ((RF_opt & OPT_PERF) |
+          (RF_opt & OPT_PERF_CALB) |
+          (RF_opt & OPT_OENS) |
+          (RF_opt & OPT_FENS)) {
+        if (RF_optHigh & OPT_TERM) {
+          unstackAuxVariableTerminalNodeOutputObjects(mode);
+        }
+      }
     }
   }
   else {
@@ -957,7 +912,9 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
         (RF_opt & OPT_PERF_CALB) |
         (RF_opt & OPT_OENS) |
         (RF_opt & OPT_FENS)) {
-      unstackAuxVariableTerminalNodeOutputObjects(mode);
+      if (RF_optHigh & OPT_TERM) {
+        unstackAuxVariableTerminalNodeOutputObjects(mode);
+      }
     }
   }
   if (RF_opt & OPT_NODE_STAT) {

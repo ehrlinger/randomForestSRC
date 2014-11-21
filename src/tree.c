@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -238,7 +238,7 @@ void acquireTree(uint mode, uint r, uint b) {
                                    RF_fobservationSize,
                                    & bootMembrIndxIter);
     if (result) {
-      if ((RF_optHigh & OPT_TERM) && (RF_opt & (OPT_BOOT_NODE | OPT_BOOT_NONE)) && RF_fmRecordSize == 0) {
+      if ((RF_optHigh & OPT_TERM) && !(RF_opt & (OPT_BOOT_NODE | OPT_BOOT_NONE)) && RF_fmRecordSize == 0) {
         restoreNodeMembershipGrow(b);
       }
     }
@@ -381,6 +381,19 @@ void acquireTree(uint mode, uint r, uint b) {
       }
     }
     if (r == RF_nImpute) {
+      if ((RF_opt & OPT_PERF) |
+          (RF_opt & OPT_PERF_CALB) |
+          (RF_opt & OPT_OENS) |
+          (RF_opt & OPT_FENS)) {
+        char multipleImputeFlag;
+        multipleImputeFlag = FALSE;
+        if (mode == RF_GROW) {
+          if (r > 1) {
+            multipleImputeFlag = TRUE;
+          }
+        }
+        updateEnsembleCalculations(multipleImputeFlag, mode, b);
+      }
       if (RF_opt & OPT_VIMP) {
         uint vimpCount;
         if (RF_opt & OPT_VIMP_JOIN) {
@@ -399,6 +412,8 @@ void acquireTree(uint mode, uint r, uint b) {
           }
           stackVimpMembership(mode, & RF_vimpMembership[intrIndex][b]);
           getVimpMembership(mode, b, RF_vimpMembership[intrIndex][b], pp);
+          updateVimpCalculations(mode, b, intrIndex, RF_vimpMembership[intrIndex][b]);
+          unstackVimpMembership(mode, RF_vimpMembership[intrIndex][b]);
         }
       }
     }  
@@ -446,18 +461,20 @@ void getWeight(uint mode) {
       error("\nRF-SRC:  The application will now exit.\n");
     }
   }
-  if ((RF_splitRule == USPV_SPLIT) || (RF_splitRule == MVRG_SPLIT) || (RF_splitRule == MVCL_SPLIT)) {
-    if (RF_numThreads > 0) {
+  if (mode == RF_GROW) {
+    if ((RF_splitRule == USPV_SPLIT) || (RF_splitRule == MVRG_SPLIT) || (RF_splitRule == MVCL_SPLIT)) {
+      if (RF_numThreads > 0) {
 #ifdef SUPPORT_OPENMP
 #pragma omp parallel for num_threads(RF_numThreads)
 #endif
-      for (b = 1; b <= RF_forestSize; b++) {
-        getMemberCountOnly(b);
+        for (b = 1; b <= RF_forestSize; b++) {
+          getMemberCountOnly(b);
+        }
       }
-    }
-    else {
-      for (b = 1; b <= RF_forestSize; b++) {
-        getMemberCountOnly(b);
+      else {
+        for (b = 1; b <= RF_forestSize; b++) {
+          getMemberCountOnly(b);
+        }
       }
     }
   }

@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.3
+////  Version 1.6
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -589,109 +589,109 @@ char restoreNodeMembership(uint  mode,
       if ((RF_optHigh & OPT_TERM) && !(RF_opt & (OPT_BOOT_NODE | OPT_BOOT_NONE)) && (RF_fmRecordSize == 0)) {
       }
       else {
-      uint *membershipIndicator = uivector(1, RF_observationSize);
-      char *randomMembrFlag = cvector(1, allMembrSize + 1);
-      leftAllMembrSize = rghtAllMembrSize = 0;
-      for (i = 1; i <= allMembrSize; i++) {
-        membershipIndicator[allMembrIndx[i]] = NEITHER;
-      }
-      offset = RF_rSize + parent -> splitParameter;
-      for (i = 1; i <= allMembrSize; i++) {
-        mPredictorFlag = FALSE;
-        if (RF_mRecordSize > 0) {
-          if (RF_mRecordMap[allMembrIndx[i]] > 0) {
-            if (RF_mpSign[offset][RF_mRecordMap[allMembrIndx[i]]] == 1) {
-              if (termOverrideFlag) {
-                mPredictorFlag = TRUE;
+        uint *membershipIndicator = uivector(1, RF_observationSize);
+        char *randomMembrFlag = cvector(1, allMembrSize + 1);
+        leftAllMembrSize = rghtAllMembrSize = 0;
+        for (i = 1; i <= allMembrSize; i++) {
+          membershipIndicator[allMembrIndx[i]] = NEITHER;
+        }
+        offset = RF_rSize + parent -> splitParameter;
+        for (i = 1; i <= allMembrSize; i++) {
+          mPredictorFlag = FALSE;
+          if (RF_mRecordSize > 0) {
+            if (RF_mRecordMap[allMembrIndx[i]] > 0) {
+              if (RF_mpSign[offset][RF_mRecordMap[allMembrIndx[i]]] == 1) {
+                if (termOverrideFlag) {
+                  mPredictorFlag = TRUE;
+                }
               }
             }
           }
+          randomMembrFlag[i] = mPredictorFlag;
         }
-        randomMembrFlag[i] = mPredictorFlag;
-      }
-      factorFlag = FALSE;
-      if (strcmp(RF_xType[parent -> splitParameter], "C") == 0) {
-        factorFlag = TRUE;
-      }
-      for (i = 1; i <= allMembrSize; i++) {
-        if (randomMembrFlag[i] == FALSE) {
-          daughterFlag = RIGHT;
-          if (factorFlag == TRUE) {
-            daughterFlag = splitOnFactor((uint) RF_observation[treeID][parent -> splitParameter][allMembrIndx[i]], parent -> splitValueFactPtr);
-          }
-          else {
-            if ( RF_observation[treeID][parent -> splitParameter][allMembrIndx[i]] <= (parent -> splitValueCont) ) {
-              daughterFlag = LEFT;
+        factorFlag = FALSE;
+        if (strcmp(RF_xType[parent -> splitParameter], "C") == 0) {
+          factorFlag = TRUE;
+        }
+        for (i = 1; i <= allMembrSize; i++) {
+          if (randomMembrFlag[i] == FALSE) {
+            daughterFlag = RIGHT;
+            if (factorFlag == TRUE) {
+              daughterFlag = splitOnFactor((uint) RF_observation[treeID][parent -> splitParameter][allMembrIndx[i]], parent -> splitValueFactPtr);
+            }
+            else {
+              if ( RF_observation[treeID][parent -> splitParameter][allMembrIndx[i]] <= (parent -> splitValueCont) ) {
+                daughterFlag = LEFT;
+              }
+            }
+            membershipIndicator[allMembrIndx[i]] = daughterFlag;
+            if (daughterFlag == LEFT) {
+              leftAllMembrSize ++;
+              RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> left;
+            }
+            else {
+              rghtAllMembrSize ++;
+              RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> right;
             }
           }
-          membershipIndicator[allMembrIndx[i]] = daughterFlag;
-          if (daughterFlag == LEFT) {
-            leftAllMembrSize ++;
-            RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> left;
-          }
           else {
-            rghtAllMembrSize ++;
-            RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> right;
-          }
-        }
-        else {
+          }  
         }  
-      }  
-      nonMissAllMembrSize = leftAllMembrSize + rghtAllMembrSize;
-      if (nonMissAllMembrSize > 0) {
-        leftProbability = (double) leftAllMembrSize / (double) nonMissAllMembrSize;
-      }
-      else {
-        leftProbability = 0.50;
-      }
-      for (i = 1; i <= allMembrSize; i++) {
-        if (randomMembrFlag[i] == TRUE) {
-          if (ran1A(treeID) <= leftProbability) {
-            daughterFlag = LEFT;
-            membershipIndicator[allMembrIndx[i]] = LEFT;
-            leftAllMembrSize ++;
-            RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> left;
-          }
-          else {
-            daughterFlag = RIGHT;
-            membershipIndicator[allMembrIndx[i]] = RIGHT;
-            rghtAllMembrSize ++;
-            RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> right;
-          }
-        }
-      }
-      free_cvector(randomMembrFlag, 1, allMembrSize + 1);
-      leftAllMembrIndx  = uivector(1, leftAllMembrSize + 1);
-      rghtAllMembrIndx  = uivector(1, rghtAllMembrSize + 1);
-      jLeft = jRght = 0;
-      for (i = 1; i <= allMembrSize; i++) {
-        if (membershipIndicator[allMembrIndx[i]] == LEFT) {
-          leftAllMembrIndx[++jLeft] = allMembrIndx[i];
+        nonMissAllMembrSize = leftAllMembrSize + rghtAllMembrSize;
+        if (nonMissAllMembrSize > 0) {
+          leftProbability = (double) leftAllMembrSize / (double) nonMissAllMembrSize;
         }
         else {
-          rghtAllMembrIndx[++jRght] = allMembrIndx[i];
+          leftProbability = 0.50;
         }
-      }
-      if ((RF_opt & OPT_BOOT_NODE) | (RF_opt & OPT_BOOT_NONE)) {
-        leftRepMembrIndx = leftAllMembrIndx;
-        leftRepMembrSize = leftAllMembrSize;
-        rghtRepMembrIndx = rghtAllMembrIndx;
-        rghtRepMembrSize = rghtAllMembrSize;
-      }
-      else {
-        leftRepMembrIndx  = uivector(1, bootMembrSize + 1);
-        rghtRepMembrIndx  = uivector(1, bootMembrSize + 1);
-        leftRepMembrSize = rghtRepMembrSize = 0;
-        for (i = 1; i <= bootMembrSize; i++) {
-          if (membershipIndicator[bootMembrIndx[i]] == LEFT) {
-            leftRepMembrIndx[++leftRepMembrSize] = bootMembrIndx[i];
+        for (i = 1; i <= allMembrSize; i++) {
+          if (randomMembrFlag[i] == TRUE) {
+            if (ran1A(treeID) <= leftProbability) {
+              daughterFlag = LEFT;
+              membershipIndicator[allMembrIndx[i]] = LEFT;
+              leftAllMembrSize ++;
+              RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> left;
+            }
+            else {
+              daughterFlag = RIGHT;
+              membershipIndicator[allMembrIndx[i]] = RIGHT;
+              rghtAllMembrSize ++;
+              RF_tNodeMembership[treeID][allMembrIndx[i]] = parent -> right;
+            }
+          }
+        }
+        free_cvector(randomMembrFlag, 1, allMembrSize + 1);
+        leftAllMembrIndx  = uivector(1, leftAllMembrSize + 1);
+        rghtAllMembrIndx  = uivector(1, rghtAllMembrSize + 1);
+        jLeft = jRght = 0;
+        for (i = 1; i <= allMembrSize; i++) {
+          if (membershipIndicator[allMembrIndx[i]] == LEFT) {
+            leftAllMembrIndx[++jLeft] = allMembrIndx[i];
           }
           else {
-            rghtRepMembrIndx[++rghtRepMembrSize] = bootMembrIndx[i];
+            rghtAllMembrIndx[++jRght] = allMembrIndx[i];
           }
         }
-      }
-      free_uivector(membershipIndicator, 1, RF_observationSize);
+        if ((RF_opt & OPT_BOOT_NODE) | (RF_opt & OPT_BOOT_NONE)) {
+          leftRepMembrIndx = leftAllMembrIndx;
+          leftRepMembrSize = leftAllMembrSize;
+          rghtRepMembrIndx = rghtAllMembrIndx;
+          rghtRepMembrSize = rghtAllMembrSize;
+        }
+        else {
+          leftRepMembrIndx  = uivector(1, bootMembrSize + 1);
+          rghtRepMembrIndx  = uivector(1, bootMembrSize + 1);
+          leftRepMembrSize = rghtRepMembrSize = 0;
+          for (i = 1; i <= bootMembrSize; i++) {
+            if (membershipIndicator[bootMembrIndx[i]] == LEFT) {
+              leftRepMembrIndx[++leftRepMembrSize] = bootMembrIndx[i];
+            }
+            else {
+              rghtRepMembrIndx[++rghtRepMembrSize] = bootMembrIndx[i];
+            }
+          }
+        }
+        free_uivector(membershipIndicator, 1, RF_observationSize);
       }  
       ngLeftAllMembrIndx = ngRghtAllMembrIndx = NULL;
       ngLeftAllMembrSize = ngRghtAllMembrSize = 0;
@@ -757,13 +757,17 @@ char restoreNodeMembership(uint  mode,
                                          bootMembrIndxIter);
       if(!rghtResult) {
       }
-      free_uivector(leftAllMembrIndx, 1, leftAllMembrSize + 1);
-      free_uivector(rghtAllMembrIndx, 1, rghtAllMembrSize + 1);
-      if ((RF_opt & OPT_BOOT_NODE) | (RF_opt & OPT_BOOT_NONE)) {
+      if ((RF_optHigh & OPT_TERM) && !(RF_opt & (OPT_BOOT_NODE | OPT_BOOT_NONE)) && (RF_fmRecordSize == 0)) {
       }
       else {
-        free_uivector(leftRepMembrIndx, 1, bootMembrSize + 1);
-        free_uivector(rghtRepMembrIndx, 1, bootMembrSize + 1);
+        free_uivector(leftAllMembrIndx, 1, leftAllMembrSize + 1);
+        free_uivector(rghtAllMembrIndx, 1, rghtAllMembrSize + 1);
+        if ((RF_opt & OPT_BOOT_NODE) | (RF_opt & OPT_BOOT_NONE)) {
+        }
+        else {
+          free_uivector(leftRepMembrIndx, 1, bootMembrSize + 1);
+          free_uivector(rghtRepMembrIndx, 1, bootMembrSize + 1);
+        }
       }
       if (mode == RF_PRED) {
         free_uivector(ngLeftAllMembrIndx, 1, ngLeftAllMembrSize + 1);
