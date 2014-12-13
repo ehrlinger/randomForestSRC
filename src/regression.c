@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.6
+////  Version 1.5.5.12
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -93,10 +93,12 @@ void getMeanResponse(uint treeID) {
       }
     }
     if (parent -> membrCount > 0) {
-      for (j=1; j <= RF_rNonFactorCount; j++) {
-        (parent -> meanResponse)[j] = (parent -> meanResponse)[j] / (double) (parent -> membrCount);
+      if (!(strcmp(RF_rType[RF_rTarget], "C") == 0)) {
+        for (j=1; j <= RF_rNonFactorCount; j++) {
+          (parent -> meanResponse)[j] = (parent -> meanResponse)[j] / (double) (parent -> membrCount);
+        }
+        parent -> predictedOutcome = (parent -> meanResponse)[RF_rNonFactorMap[RF_rTarget]];
       }
-      parent -> predictedOutcome = (parent -> meanResponse)[RF_rNonFactorMap[RF_rTarget]];
     }
     else {
       parent -> predictedOutcome =  NA_REAL;

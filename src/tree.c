@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.6
+////  Version 1.5.5.12
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -190,6 +190,9 @@ void acquireTree(uint mode, uint r, uint b) {
                        0,
                        RF_maxDepth + b,
                        & bootMembrIndxIter);
+    if (getTraceFlag(b) & SUMM_USR_TRACE) {
+      Rprintf("\nTree Complete:  (MII:  %10d, ID:  %10d)", r, b);
+    }
     if (result) {
       stackNodeList(b);
       initNodeList(b);
@@ -461,20 +464,18 @@ void getWeight(uint mode) {
       error("\nRF-SRC:  The application will now exit.\n");
     }
   }
-  if (mode == RF_GROW) {
-    if ((RF_splitRule == USPV_SPLIT) || (RF_splitRule == MVRG_SPLIT) || (RF_splitRule == MVCL_SPLIT)) {
-      if (RF_numThreads > 0) {
+  if (!((RF_opt & OPT_OENS) | (RF_opt & OPT_FENS))) {
+    if (RF_numThreads > 0) {
 #ifdef SUPPORT_OPENMP
 #pragma omp parallel for num_threads(RF_numThreads)
 #endif
-        for (b = 1; b <= RF_forestSize; b++) {
-          getMemberCountOnly(b);
-        }
+      for (b = 1; b <= RF_forestSize; b++) {
+        getMemberCountOnly(b);
       }
-      else {
-        for (b = 1; b <= RF_forestSize; b++) {
-          getMemberCountOnly(b);
-        }
+    }
+    else {
+      for (b = 1; b <= RF_forestSize; b++) {
+        getMemberCountOnly(b);
       }
     }
   }

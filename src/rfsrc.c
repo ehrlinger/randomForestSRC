@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.6
+////  Version 1.5.5.12
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -368,6 +368,7 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
   int vimpCount, b, p;
   uint seedValueLC;
   totalMWCPCount = 0; 
+  setTraceFlag(traceFlag, 0);
   if (RF_nImpute < 1) {
     Rprintf("\nRF-SRC:  *** ERROR *** ");
     Rprintf("\nRF-SRC:  Parameter verification failed.");
@@ -763,6 +764,9 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
       }
     }  
   }  
+  if (getTraceFlag(0) & SUMM_USR_TRACE) {
+    Rprintf("\n\n");
+  }
   for (b = 1; b <= RF_forestSize; b++) {
     unstackAuxiliary(mode, b);
     if (RF_tLeafCount[b] > 0) {

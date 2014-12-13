@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.6
+////  Version 1.5.5.12
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -231,14 +231,28 @@ char unsupervisedSplit (uint    treeID,
       free_uivector(pseudoResponseIndex, 1, RF_xSize);
       if ((RF_mRecordSize == 0) || (multImpFlag) || (!(RF_optHigh & OPT_MISS_SKIP))) {
         tempNonMissMembrFlag = cvector(1, nonMissMembrSize);
+        tempNonMissMembrIndx = uivector(1, nonMissMembrSize);
         for (k = 1; k <= nonMissMembrSize; k++) {
           tempNonMissMembrFlag[k] = TRUE;
+          tempNonMissMembrIndx[k] = k;
         }
         for (r = 1; r <= RF_randomResponseCount; r++) {
           secondNonMissMembrFlag[r] = tempNonMissMembrFlag;
           secondNonMissMembrSize[r] = nonMissMembrSize;
         }
-        nonMissImpuritySummary = TRUE;
+        nonMissImpuritySummary = FALSE;
+        for (r = 1; r <= RF_randomResponseCount; r++)  {
+          impurity[r] = getVariance(repMembrSize,
+                                    repMembrIndx,
+                                    secondNonMissMembrSize[r],
+                                    tempNonMissMembrIndx,
+                                    RF_observation[treeID][pseudoResponse[r]],
+                                    &mean[r],
+                                    &variance[r]);
+          nonMissImpuritySummary = nonMissImpuritySummary | impurity[r];
+          secondNonMissMembrLeftSize[r] = secondNonMissMembrRghtSize[r] = 0;
+        }
+        free_uivector(tempNonMissMembrIndx, 1, nonMissMembrSize);
       }
       else {
         tempNonMissMembrIndx = uivector(1, nonMissMembrSize);

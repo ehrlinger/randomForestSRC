@@ -28,7 +28,8 @@
     
     \item{xvar.wt}{Weights for selecting variables for splitting on.}
 
-    \item{do.trace}{Should trace output be enabled?} 
+    \item{do.trace}{Logical. Should trace output be enabled on each
+      iteration? Default is \code{FALSE}.}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{

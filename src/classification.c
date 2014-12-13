@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.6
+////  Version 1.5.5.12
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -96,15 +96,17 @@ void getMultiClassProb (uint treeID) {
       }
     }
     if ((parent -> membrCount) > 0) {
-      maxValue = 0;
-      maxClass = 0;
-      for (k=1; k <= RF_rFactorSize[RF_rFactorMap[RF_rTarget]]; k++) {
-        if (maxValue < (parent -> multiClassProb[RF_rFactorMap[RF_rTarget]][k])) {
-          maxValue = parent -> multiClassProb[RF_rFactorMap[RF_rTarget]][k];
-          maxClass = (double) k;
+      if (strcmp(RF_rType[RF_rTarget], "C") == 0) {
+        maxValue = 0;
+        maxClass = 0;
+        for (k=1; k <= RF_rFactorSize[RF_rFactorMap[RF_rTarget]]; k++) {
+          if (maxValue < (parent -> multiClassProb[RF_rFactorMap[RF_rTarget]][k])) {
+            maxValue = parent -> multiClassProb[RF_rFactorMap[RF_rTarget]][k];
+            maxClass = (double) k;
+          }
         }
+        parent -> predictedOutcome = maxClass;
       }
-      parent -> predictedOutcome = maxClass;
     }
     else {
       parent -> predictedOutcome = NA_REAL;

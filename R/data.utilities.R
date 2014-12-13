@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 1.6
+####  Version 1.5.5.12
 ####
 ####  Copyright 2012, University of Miami
 ####
@@ -646,6 +646,9 @@ parseFormula <- function(f, data) {
         stop("formula is incorrectly specified.")
     }
     Y <- data[, yvar.names]
+    if (is.logical(Y)) {
+      Y <- as.numeric(Y)
+    }
     if (!(is.factor(Y) | is.numeric(Y))) {
       stop("the y-outcome must be either real or a factor.")
     }

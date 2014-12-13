@@ -1,15 +1,17 @@
 Package: randomForestSRC
-Version: 1.6
-BUILD: bld20141114
+Version: 1.5.5.12
+BUILD: bld20141210
 
 ---------------------------------------------------------------------------------
-CHANGES TO RELEASE 1.6
+CHANGES TO RELEASE 1.5.5.12
 ---------------------------------------------------------------------------------
-RELEASE 1.6
+RELEASE 1.5.5.12
 Bug fix to duplicating missingness protocol when restoring a forest.
 Added fast.restore option to grow call.  Change to pass through
 xvar.wt as entered by user. RAM profile reduction in vimp().  Added
-versioning checks of forest object.
+versioning checks of forest object, thanks to suggestions by John
+Ehrlinger.  Bug fix to allow logical responses, treated as reals. User
+trace functionality restored.
 
 ---------------------------------------------------------------------------------
 RELEASE 1.5.5

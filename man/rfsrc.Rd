@@ -171,9 +171,8 @@ rfsrc(formula, data, ntree = 1000,
       \code{by.tree}. Used for variable selection.}
     \item{seed}{Negative integer specifying seed for the random number
       generator.}
-    \item{do.trace}{Should trace output be enabled? Default is
-        \code{FALSE}. Integer values can also be passed.  A positive value
-	causes output to be printed each \code{do.trace} iteration.}
+    \item{do.trace}{Logical. Should trace output be enabled on each
+      iteration? Default is \code{FALSE}.}
     \item{membership}{Should terminal node membership and inbag
       information be returned?}
  \item{statistics}{Should split statistics be returned?  Values can be

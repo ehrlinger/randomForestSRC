@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 1.6
+####  Version 1.5.5.12
 ####
 ####  Copyright 2012, University of Miami
 ####
@@ -369,7 +369,7 @@ rfsrc <- function(formula,
                        bootstrap = bootstrap,
                        fast.restore.bits = fast.restore.bits,
                        nativeArrayTNDS = nativeArrayTNDS,
-                       version = 1.6,
+                       version = "1.5.5.12",
                        na.action = na.action)
     if (grepl("surv", fmly)) {
       forest.out$time.interest <- event.info$time.interest
