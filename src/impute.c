@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.12
+////  Version 1.6.0
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -577,8 +577,15 @@ char restoreNodeMembership(uint  mode,
     }
   }  
   if (bootResult) {
-    if ((RF_opt & OPT_NODE_STAT) || (RF_ptnCount > 0)) {
-      getVariance(repMembrSize, repMembrIndx, 0, NULL, RF_response[treeID][RF_rTarget], NULL, & (parent -> variance));
+    if (RF_opt & OPT_NODE_STAT) {
+      if (RF_ptnCount == 0) {
+        if (((RF_timeIndex > 0) && (RF_statusIndex > 0)) || (RF_rSize == 0)) {
+          parent -> variance = NA_REAL;
+        }
+        else {
+          getVariance(repMembrSize, repMembrIndx, 0, NULL, RF_response[treeID][RF_rTarget], NULL, & (parent -> variance));
+        }
+      }
     }
     if (((parent -> left) != NULL) && ((parent -> right) != NULL)) {
       tnUpdateFlag = FALSE;

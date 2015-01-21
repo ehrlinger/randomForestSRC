@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 1.5.5.12
+////  Version 1.6.0
 ////
 ////  Copyright 2012, University of Miami
 ////
@@ -190,9 +190,12 @@ void acquireTree(uint mode, uint r, uint b) {
                        0,
                        RF_maxDepth + b,
                        & bootMembrIndxIter);
+#ifdef SUPPORT_OPENMP
+#else
     if (getTraceFlag(b) & SUMM_USR_TRACE) {
-      Rprintf("\nTree Complete:  (MII:  %10d, ID:  %10d)", r, b);
+        Rprintf("\nTree Complete:  (MII:  %10d, ID:  %10d)", r, b);
     }
+#endif
     if (result) {
       stackNodeList(b);
       initNodeList(b);
