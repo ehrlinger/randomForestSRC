@@ -38,25 +38,25 @@ test_that("rfsrc classifications",{
   data(pbc, package = "randomForestSRC")
   pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
                     nsplit = 10, na.action = "na.impute")
-  
-  
-  # here's a nice wrapper to combine original data + imputed data
-  combine.impute <- function(object) {
-    impData <- cbind(object$yvar, object$xvar)
-    if (!is.null(object$imputed.indv)) {
-      impData[object$imputed.indv, ] <- object$imputed.data
-    }
-    impData
-  }
-  
-  # combine original data + imputed data
-  pbc.imp.data <- combine.impute(pbc.obj2)
-  
-  # same as above but we iterate the missing data algorithm
-  pbc.obj3 <- rfsrc(Surv(days, status) ~ ., pbc, nsplit=10,
-                    na.action = "na.impute", nimpute = 3)
-  pbc.iterate.imp.data <- combine.impute(pbc.obj3)
-  
+#   
+#   
+#   # here's a nice wrapper to combine original data + imputed data
+#   combine.impute <- function(object) {
+#     impData <- cbind(object$yvar, object$xvar)
+#     if (!is.null(object$imputed.indv)) {
+#       impData[object$imputed.indv, ] <- object$imputed.data
+#     }
+#     impData
+#   }
+#   
+#   # combine original data + imputed data
+#   pbc.imp.data <- combine.impute(pbc.obj2)
+#   
+#   # same as above but we iterate the missing data algorithm
+#   pbc.obj3 <- rfsrc(Surv(days, status) ~ ., pbc, nsplit=10,
+#                     na.action = "na.impute", nimpute = 3)
+#   pbc.iterate.imp.data <- combine.impute(pbc.obj3)
+#   
   # fast way to impute the data (no inference is done)
   # see impute.rfsc for more details
   pbc.fast.imp.data <- impute.rfsrc(data = pbc, nsplit = 10, nimpute = 5)
