@@ -15,10 +15,6 @@ test_that("rfsrc classifications",{
   print(v.obj)
   plot(v.obj)
   
-  # plot survival curves for first 10 individuals: direct way
-  matplot(v.obj$time.interest, 100 * t(v.obj$survival[1:10, ]),
-          xlab = "Time", ylab = "Survival", type = "l", lty = 1)
-  
   # plot survival curves for first 10 individuals
   # indirect way: using plot.survival (also generates hazard plots)
   plot.survival(v.obj, subset = 1:10, haz.model = "ggamma")
@@ -26,18 +22,18 @@ test_that("rfsrc classifications",{
   
   ## Primary biliary cirrhosis (PBC) of the liver
   
-  data(pbc, package = "randomForestSRC")
-  pbc.obj <- rfsrc(Surv(days, status) ~ ., pbc, nsplit = 10)
-  print(pbc.obj)
+#   data(pbc, package = "randomForestSRC")
+#   pbc.obj <- rfsrc(Surv(days, status) ~ ., pbc, nsplit = 10)
+#   print(pbc.obj)
 #   
 #   
 #   ##------------------------------------------------------------
 #   ## Example of imputation in survival analysis
 #   ##------------------------------------------------------------
 #   
-#   data(pbc, package = "randomForestSRC")
-#   pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
-#                     nsplit = 10, na.action = "na.impute")
+  data(pbc, package = "randomForestSRC")
+  pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
+                    nsplit = 10, na.action = "na.impute")
 #   
 #   
 #   # here's a nice wrapper to combine original data + imputed data
