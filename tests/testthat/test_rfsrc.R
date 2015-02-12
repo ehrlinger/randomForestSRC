@@ -10,34 +10,34 @@ test_that("rfsrc classifications",{
   ## randomized trial of two treatment regimens for lung cancer
   data(veteran, package = "randomForestSRC")
   v.obj <- rfsrc(Surv(time, status) ~ ., data = veteran, ntree = 100)
-  
-  # print and plot the grow object
-  print(v.obj)
-  plot(v.obj)
-  
-  # plot survival curves for first 10 individuals: direct way
-  matplot(v.obj$time.interest, 100 * t(v.obj$survival[1:10, ]),
-          xlab = "Time", ylab = "Survival", type = "l", lty = 1)
-  
-  # plot survival curves for first 10 individuals
-  # indirect way: using plot.survival (also generates hazard plots)
-  plot.survival(v.obj, subset = 1:10, haz.model = "ggamma")
-  
-  
-  ## Primary biliary cirrhosis (PBC) of the liver
-  
-  data(pbc, package = "randomForestSRC")
-  pbc.obj <- rfsrc(Surv(days, status) ~ ., pbc, nsplit = 10)
-  print(pbc.obj)
-  
-  
-  ##------------------------------------------------------------
-  ## Example of imputation in survival analysis
-  ##------------------------------------------------------------
-  
-  data(pbc, package = "randomForestSRC")
-  pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
-                    nsplit = 10, na.action = "na.impute")
+#   
+#   # print and plot the grow object
+#   print(v.obj)
+#   plot(v.obj)
+#   
+#   # plot survival curves for first 10 individuals: direct way
+#   matplot(v.obj$time.interest, 100 * t(v.obj$survival[1:10, ]),
+#           xlab = "Time", ylab = "Survival", type = "l", lty = 1)
+#   
+#   # plot survival curves for first 10 individuals
+#   # indirect way: using plot.survival (also generates hazard plots)
+#   plot.survival(v.obj, subset = 1:10, haz.model = "ggamma")
+#   
+#   
+#   ## Primary biliary cirrhosis (PBC) of the liver
+#   
+#   data(pbc, package = "randomForestSRC")
+#   pbc.obj <- rfsrc(Surv(days, status) ~ ., pbc, nsplit = 10)
+#   print(pbc.obj)
+#   
+#   
+#   ##------------------------------------------------------------
+#   ## Example of imputation in survival analysis
+#   ##------------------------------------------------------------
+#   
+#   data(pbc, package = "randomForestSRC")
+#   pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
+#                     nsplit = 10, na.action = "na.impute")
 #   
 #   
 #   # here's a nice wrapper to combine original data + imputed data
@@ -176,36 +176,36 @@ test_that("rfsrc classifications",{
   ## ------------------------------------------------------------
   ## Regression analysis
   ## ------------------------------------------------------------
-  
-  ## New York air quality measurements
-  airq.obj <- rfsrc(Ozone ~ ., data = airquality, na.action = "na.impute")
-  
-  # partial plot of variables (see plot.variable for more details)
-  plot.variable(airq.obj, partial = TRUE, smooth.lines = TRUE)
-  
-  ## motor trend cars
-  mtcars.obj <- rfsrc(mpg ~ ., data = mtcars)
-  
-  # minimal depth variable selection via max.subtree
-  md.obj <- max.subtree(mtcars.obj)
-  cat("top variables:\n")
-  print(md.obj$topvars)
-  
-  # equivalent way to select variables
-  # see var.select for more details
-  vs.obj <- var.select(object = mtcars.obj)
-  
-  
-  ## ------------------------------------------------------------
-  ## Classification analysis
-  ## ------------------------------------------------------------
-  
-  ## Edgar Anderson's iris data
-  iris.obj <- rfsrc(Species ~., data = iris)
-  
-  ## Wisconsin prognostic breast cancer data
-  data(breast, package = "randomForestSRC")
-  breast.obj <- rfsrc(status ~ ., data = breast, nsplit = 10)
-  plot(breast.obj)
+#   
+#   ## New York air quality measurements
+#   airq.obj <- rfsrc(Ozone ~ ., data = airquality, na.action = "na.impute")
+#   
+#   # partial plot of variables (see plot.variable for more details)
+#   plot.variable(airq.obj, partial = TRUE, smooth.lines = TRUE)
+#   
+#   ## motor trend cars
+#   mtcars.obj <- rfsrc(mpg ~ ., data = mtcars)
+#   
+#   # minimal depth variable selection via max.subtree
+#   md.obj <- max.subtree(mtcars.obj)
+#   cat("top variables:\n")
+#   print(md.obj$topvars)
+#   
+#   # equivalent way to select variables
+#   # see var.select for more details
+#   vs.obj <- var.select(object = mtcars.obj)
+#   
+#   
+#   ## ------------------------------------------------------------
+#   ## Classification analysis
+#   ## ------------------------------------------------------------
+#   
+#   ## Edgar Anderson's iris data
+#   iris.obj <- rfsrc(Species ~., data = iris)
+#   
+#   ## Wisconsin prognostic breast cancer data
+#   data(breast, package = "randomForestSRC")
+#   breast.obj <- rfsrc(status ~ ., data = breast, nsplit = 10)
+#   plot(breast.obj)
   
 })
