@@ -3,3 +3,9 @@
 .Rhistory
 .RData
 packrat/lib*/
+*.o
+config.*
+autom4te*
+*.so
+configure
+Makevars
