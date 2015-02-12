@@ -10,25 +10,25 @@ test_that("rfsrc classifications",{
   ## randomized trial of two treatment regimens for lung cancer
   data(veteran, package = "randomForestSRC")
   v.obj <- rfsrc(Surv(time, status) ~ ., data = veteran, ntree = 100)
-#   
-#   # print and plot the grow object
-#   print(v.obj)
-#   plot(v.obj)
-#   
-#   # plot survival curves for first 10 individuals: direct way
-#   matplot(v.obj$time.interest, 100 * t(v.obj$survival[1:10, ]),
-#           xlab = "Time", ylab = "Survival", type = "l", lty = 1)
-#   
-#   # plot survival curves for first 10 individuals
-#   # indirect way: using plot.survival (also generates hazard plots)
-#   plot.survival(v.obj, subset = 1:10, haz.model = "ggamma")
-#   
-#   
-#   ## Primary biliary cirrhosis (PBC) of the liver
-#   
-#   data(pbc, package = "randomForestSRC")
-#   pbc.obj <- rfsrc(Surv(days, status) ~ ., pbc, nsplit = 10)
-#   print(pbc.obj)
+  
+  # print and plot the grow object
+  print(v.obj)
+  plot(v.obj)
+  
+  # plot survival curves for first 10 individuals: direct way
+  matplot(v.obj$time.interest, 100 * t(v.obj$survival[1:10, ]),
+          xlab = "Time", ylab = "Survival", type = "l", lty = 1)
+  
+  # plot survival curves for first 10 individuals
+  # indirect way: using plot.survival (also generates hazard plots)
+  plot.survival(v.obj, subset = 1:10, haz.model = "ggamma")
+  
+  
+  ## Primary biliary cirrhosis (PBC) of the liver
+  
+  data(pbc, package = "randomForestSRC")
+  pbc.obj <- rfsrc(Surv(days, status) ~ ., pbc, nsplit = 10)
+  print(pbc.obj)
 #   
 #   
 #   ##------------------------------------------------------------
