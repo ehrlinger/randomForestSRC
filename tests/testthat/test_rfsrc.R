@@ -32,10 +32,10 @@ test_that("rfsrc classifications",{
   #   ## Example of imputation in survival analysis
   #   ##------------------------------------------------------------
   #   
-  data(pbc, package = "randomForestSRC")
-  expect_is(pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
-                              nsplit = 10, na.action = "na.impute"),
-            "rfsrc")
+#   data(pbc, package = "randomForestSRC")
+#   expect_is(pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
+#                               nsplit = 10, na.action = "na.impute"),
+#             "rfsrc")
   #   
   #   
   #   # here's a nice wrapper to combine original data + imputed data
