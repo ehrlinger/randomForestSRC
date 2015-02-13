@@ -32,10 +32,10 @@ test_that("rfsrc classifications",{
   #   ## Example of imputation in survival analysis
   #   ##------------------------------------------------------------
   #   
-#   data(pbc, package = "randomForestSRC")
-#   expect_is(pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
-#                               nsplit = 10, na.action = "na.impute"),
-#             "rfsrc")
+  #   data(pbc, package = "randomForestSRC")
+  #   expect_is(pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
+  #                               nsplit = 10, na.action = "na.impute"),
+  #             "rfsrc")
   #   
   #   
   #   # here's a nice wrapper to combine original data + imputed data
@@ -175,23 +175,31 @@ test_that("rfsrc classifications",{
   ## Regression analysis
   ## ------------------------------------------------------------
   #   
-  #   ## New York air quality measurements
-  #   airq.obj <- rfsrc(Ozone ~ ., data = airquality, na.action = "na.impute")
-  #   
-  #   # partial plot of variables (see plot.variable for more details)
-  #   plot.variable(airq.obj, partial = TRUE, smooth.lines = TRUE)
-  #   
-  #   ## motor trend cars
-  #   mtcars.obj <- rfsrc(mpg ~ ., data = mtcars)
-  #   
-  #   # minimal depth variable selection via max.subtree
-  #   md.obj <- max.subtree(mtcars.obj)
-  #   cat("top variables:\n")
+  ## New York air quality measurements
+  expect_is(airq.obj <- rfsrc(Ozone ~ ., data = airquality, na.action = "na.impute"),
+            "rfsrc")
+  
+  # partial plot of variables (see plot.variable for more details)
+  expect_is(pdta <- plot.variable(airq.obj, partial = TRUE, 
+                                  smooth.lines = TRUE,
+                                  show.plots = FALSE),
+            "plot.variable")
+  
+  ## motor trend cars
+  expect_is(mtcars.obj <- rfsrc(mpg ~ ., data = mtcars),
+            "rfsrc")
+  
+  # minimal depth variable selection via max.subtree
+  expect_is(md.obj <- max.subtree(mtcars.obj),
+            "list")
+  
+  #cat("top variables:\n")
   #   print(md.obj$topvars)
   #   
   #   # equivalent way to select variables
   #   # see var.select for more details
-  #   vs.obj <- var.select(object = mtcars.obj)
+  expect_is(vs.obj <- var.select(object = mtcars.obj),
+            "list")
   #   
   #   
   #   ## ------------------------------------------------------------

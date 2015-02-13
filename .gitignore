@@ -9,3 +9,5 @@ autom4te*
 *.so
 configure
 Makevars
+*.gcda
+*.gcno
