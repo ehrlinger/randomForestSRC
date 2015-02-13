@@ -176,8 +176,9 @@ test_that("rfsrc classifications",{
   ## ------------------------------------------------------------
   #   
   ## New York air quality measurements
-  expect_is(airq.obj <- rfsrc(Ozone ~ ., data = airquality, na.action = "na.impute"),
-            "rfsrc")
+#   expect_is(airq.obj <- rfsrc(Ozone ~ ., data = airquality, 
+#                               na.action = "na.impute"),
+#             "rfsrc")
   
   # partial plot of variables (see plot.variable for more details)
 #   expect_is(pdta <- plot.variable(airq.obj, partial = TRUE, 
@@ -186,9 +187,9 @@ test_that("rfsrc classifications",{
 #             "plot.variable")
   
 #   ## motor trend cars
-#   expect_is(mtcars.obj <- rfsrc(mpg ~ ., data = mtcars),
-#             "rfsrc")
-#   
+  expect_is(mtcars.obj <- rfsrc(mpg ~ ., data = mtcars),
+            "rfsrc")
+  
   # minimal depth variable selection via max.subtree
 #   expect_is(md.obj <- max.subtree(mtcars.obj),
 #             "list")
