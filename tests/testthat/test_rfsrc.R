@@ -32,7 +32,7 @@ test_that("rfsrc classifications",{
   #   ## Example of imputation in survival analysis
   #   ##------------------------------------------------------------
   #   
-  #   data(pbc, package = "randomForestSRC")
+  data(pbc, package = "randomForestSRC")
   #   expect_is(pbc.obj2 <- rfsrc(Surv(days, status) ~ ., pbc,
   #                               nsplit = 10, na.action = "na.impute"),
   #             "rfsrc")
@@ -57,7 +57,7 @@ test_that("rfsrc classifications",{
   #   
   # fast way to impute the data (no inference is done)
   # see impute.rfsc for more details
-  #  pbc.fast.imp.data <- impute.rfsrc(data = pbc, nsplit = 10, nimpute = 5)
+  pbc.fast.imp.data <- impute.rfsrc(data = pbc, nsplit = 10, nimpute = 5)
   #   
   #   ##------------------------------------------------------------
   #   ## Compare RF-SRC to Cox regression
