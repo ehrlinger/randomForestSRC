@@ -57,66 +57,66 @@ test_that("rfsrc classifications",{
   #   
   # fast way to impute the data (no inference is done)
   # see impute.rfsc for more details
-  pbc.fast.imp.data <- impute.rfsrc(data = pbc, nsplit = 10, nimpute = 5)
+  # pbc.fast.imp.data <- impute.rfsrc(data = pbc, nsplit = 10, nimpute = 5)
   #   
-  #   ##------------------------------------------------------------
-  #   ## Compare RF-SRC to Cox regression
-  #   ## Illustrates C-index and Brier score measures of performance
-  #   ## assumes "pec" and "survival" libraries are loaded
-  #   ##------------------------------------------------------------
-  #   
-  #   if (library("survival", logical.return = TRUE)
-  #       & library("pec", logical.return = TRUE) 
-  #       & library("prodlim", logical.return = TRUE)
-  #       & library("Hmisc", logical.return = TRUE) )
-  #   {
-  #     ##prediction function required for pec
-  #     predictSurvProb.rfsrc <- function(object, newdata, times, ...){
-  #       ptemp <- predict(object,newdata=newdata,...)$survival
-  #       pos <- sindex(jump.times = object$time.interest, eval.times = times)
-  #       p <- cbind(1,ptemp)[, pos + 1]
-  #       if (NROW(p) != NROW(newdata) || NCOL(p) != length(times))
-  #         stop("Prediction failed")
-  #       p
-  #     }
-  #     
-  #     ## data, formula specifications
-  #     data(pbc, package = "randomForestSRC")
-  #     pbc.na <- na.omit(pbc)  ##remove NA's
-  #     surv.f <- as.formula(Surv(days, status) ~ .)
-  #     pec.f <- as.formula(Hist(days,status) ~ 1)
-  #     
-  #     ## run cox/rfsrc models
-  #     ## for illustration we use a small number of trees
-  #     cox.obj <- coxph(surv.f, data = pbc.na)
-  #     rfsrc.obj <- rfsrc(surv.f, pbc.na, nsplit = 10, ntree = 150)
-  #     
-  #     ## compute bootstrap cross-validation estimate of expected Brier score
-  #     ## see Mogensen, Ishwaran and Gerds (2012) Journal of Statistical Software
-  #     set.seed(17743)
-  #     prederror.pbc <- pec(list(cox.obj,rfsrc.obj), data = pbc.na, formula = pec.f,
-  #                          splitMethod = "bootcv", B = 50)
-  #     print(prederror.pbc)
-  #     plot(prederror.pbc)
-  #     
-  #     ## compute out-of-bag C-index for cox regression and compare to rfsrc
-  #     rfsrc.obj <- rfsrc(surv.f, pbc.na, nsplit = 10)
-  #     cat("out-of-bag Cox Analysis ...", "\n")
-  #     cox.err <- sapply(1:100, function(b) {
-  #       if (b%%10 == 0) cat("cox bootstrap:", b, "\n")
-  #       train <- sample(1:nrow(pbc.na), nrow(pbc.na), replace = TRUE)
-  #       cox.obj <- tryCatch({coxph(surv.f, pbc.na[train, ])}, error=function(ex){NULL})
-  #       if (is.list(cox.obj)) {
-  #         rcorr.cens(predict(cox.obj, pbc.na[-train, ]),
-  #                    Surv(pbc.na$days[-train],
-  #                         pbc.na$status[-train]))[1]
-  #       } else NA
-  #     })
-  #     cat("\n\tOOB error rates\n\n")
-  #     cat("\tRSF            : ", rfsrc.obj$err.rate[rfsrc.obj$ntree], "\n")
-  #     cat("\tCox regression : ", mean(cox.err, na.rm = TRUE), "\n")
-  #   }
-  #   
+    ##------------------------------------------------------------
+    ## Compare RF-SRC to Cox regression
+    ## Illustrates C-index and Brier score measures of performance
+    ## assumes "pec" and "survival" libraries are loaded
+    ##------------------------------------------------------------
+    
+    if (library("survival", logical.return = TRUE)
+        & library("pec", logical.return = TRUE) 
+        & library("prodlim", logical.return = TRUE)
+        & library("Hmisc", logical.return = TRUE) )
+    {
+      ##prediction function required for pec
+      predictSurvProb.rfsrc <- function(object, newdata, times, ...){
+        ptemp <- predict(object,newdata=newdata,...)$survival
+        pos <- sindex(jump.times = object$time.interest, eval.times = times)
+        p <- cbind(1,ptemp)[, pos + 1]
+        if (NROW(p) != NROW(newdata) || NCOL(p) != length(times))
+          stop("Prediction failed")
+        p
+      }
+      
+      ## data, formula specifications
+      data(pbc, package = "randomForestSRC")
+      pbc.na <- na.omit(pbc)  ##remove NA's
+      surv.f <- as.formula(Surv(days, status) ~ .)
+      pec.f <- as.formula(Hist(days,status) ~ 1)
+      
+      ## run cox/rfsrc models
+      ## for illustration we use a small number of trees
+      cox.obj <- coxph(surv.f, data = pbc.na)
+      rfsrc.obj <- rfsrc(surv.f, pbc.na, ntree = 150)
+      
+      ## compute bootstrap cross-validation estimate of expected Brier score
+      ## see Mogensen, Ishwaran and Gerds (2012) Journal of Statistical Software
+      set.seed(17743)
+      prederror.pbc <- pec(list(cox.obj,rfsrc.obj), data = pbc.na, formula = pec.f,
+                           splitMethod = "bootcv", B = 50)
+      print(prederror.pbc)
+      plot(prederror.pbc)
+      
+      ## compute out-of-bag C-index for cox regression and compare to rfsrc
+      rfsrc.obj <- rfsrc(surv.f, pbc.na, nsplit = 10)
+      cat("out-of-bag Cox Analysis ...", "\n")
+      cox.err <- sapply(1:100, function(b) {
+        if (b%%10 == 0) cat("cox bootstrap:", b, "\n")
+        train <- sample(1:nrow(pbc.na), nrow(pbc.na), replace = TRUE)
+        cox.obj <- tryCatch({coxph(surv.f, pbc.na[train, ])}, error=function(ex){NULL})
+        if (is.list(cox.obj)) {
+          rcorr.cens(predict(cox.obj, pbc.na[-train, ]),
+                     Surv(pbc.na$days[-train],
+                          pbc.na$status[-train]))[1]
+        } else NA
+      })
+      cat("\n\tOOB error rates\n\n")
+      cat("\tRSF            : ", rfsrc.obj$err.rate[rfsrc.obj$ntree], "\n")
+      cat("\tCox regression : ", mean(cox.err, na.rm = TRUE), "\n")
+    }
+    
   #   ##------------------------------------------------------------
   #   ## Competing risks
   #   ##------------------------------------------------------------
