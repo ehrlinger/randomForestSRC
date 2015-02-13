@@ -180,15 +180,15 @@ test_that("rfsrc classifications",{
             "rfsrc")
   
   # partial plot of variables (see plot.variable for more details)
-  expect_is(pdta <- plot.variable(airq.obj, partial = TRUE, 
-                                  smooth.lines = TRUE,
-                                  show.plots = FALSE),
-            "plot.variable")
+#   expect_is(pdta <- plot.variable(airq.obj, partial = TRUE, 
+#                                   smooth.lines = TRUE,
+#                                   show.plots = FALSE),
+#             "plot.variable")
   
-  ## motor trend cars
-  expect_is(mtcars.obj <- rfsrc(mpg ~ ., data = mtcars),
-            "rfsrc")
-  
+#   ## motor trend cars
+#   expect_is(mtcars.obj <- rfsrc(mpg ~ ., data = mtcars),
+#             "rfsrc")
+#   
   # minimal depth variable selection via max.subtree
 #   expect_is(md.obj <- max.subtree(mtcars.obj),
 #             "list")
