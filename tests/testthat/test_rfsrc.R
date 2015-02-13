@@ -176,17 +176,17 @@ test_that("rfsrc classifications",{
   ## ------------------------------------------------------------
   #   
   ## New York air quality measurements
-#   expect_is(airq.obj <- rfsrc(Ozone ~ ., data = airquality, 
-#                               na.action = "na.impute"),
-#             "rfsrc")
+  #   expect_is(airq.obj <- rfsrc(Ozone ~ ., data = airquality, 
+  #                               na.action = "na.impute"),
+  #             "rfsrc")
   
   # partial plot of variables (see plot.variable for more details)
-#   expect_is(pdta <- plot.variable(airq.obj, partial = TRUE, 
-#                                   smooth.lines = TRUE,
-#                                   show.plots = FALSE),
-#             "plot.variable")
+  #   expect_is(pdta <- plot.variable(airq.obj, partial = TRUE, 
+  #                                   smooth.lines = TRUE,
+  #                                   show.plots = FALSE),
+  #             "plot.variable")
   
-#   ## motor trend cars
+  #   ## motor trend cars
   expect_is(mtcars.obj <- rfsrc(mpg ~ ., data = mtcars),
             "rfsrc")
   
@@ -199,20 +199,20 @@ test_that("rfsrc classifications",{
   #   
   #   # equivalent way to select variables
   #   # see var.select for more details
-#   expect_is(vs.obj <- var.select(object = mtcars.obj),
-#             "list")
-#   #   
+  expect_is(vs.obj <- var.select(object = mtcars.obj),
+            "list")
+  #   
   #   
   #   ## ------------------------------------------------------------
   #   ## Classification analysis
   #   ## ------------------------------------------------------------
   #   
   #   ## Edgar Anderson's iris data
-  #   iris.obj <- rfsrc(Species ~., data = iris)
+  iris.obj <- rfsrc(Species ~., data = iris)
   #   
   #   ## Wisconsin prognostic breast cancer data
-  #   data(breast, package = "randomForestSRC")
-  #   breast.obj <- rfsrc(status ~ ., data = breast, nsplit = 10)
-  #   plot(breast.obj)
+  data(breast, package = "randomForestSRC")
+  breast.obj <- rfsrc(status ~ ., data = breast, nsplit = 10)
+  plot(breast.obj)
   
 })
