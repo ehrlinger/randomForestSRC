@@ -191,9 +191,9 @@ test_that("rfsrc classifications",{
             "rfsrc")
   
   # minimal depth variable selection via max.subtree
-#   expect_is(md.obj <- max.subtree(mtcars.obj),
-#             "list")
-#   
+  expect_is(md.obj <- max.subtree(mtcars.obj),
+            "list")
+  
   #cat("top variables:\n")
   #   print(md.obj$topvars)
   #   
