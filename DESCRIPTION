@@ -8,6 +8,9 @@ Maintainer: Udaya B. Kogalur <ubk@kogalur.com>
 Depends: R (>= 3.1.0), parallel
 Suggests: glmnet, XML, survival, pec, Hmisc, mlbench, testthat, prodlim
 Description: A unified treatment of Breiman's random forests for survival, regression and classification problems based on Ishwaran and Kogalur's random survival forests (RSF) package.  The package runs in both serial and parallel (OpenMP) modes. 
-License: GPL (>=3)
+License: GPL (>= 3)
 URL: http://web.ccs.miami.edu/~hishwaran http://www.kogalur.com
 Packaged: 2015-01-05 14:11:58 UTC; kogalur
+NeedsCompilation: yes
+Repository: CRAN
+Date/Publication: 2015-01-12 23:15:25
