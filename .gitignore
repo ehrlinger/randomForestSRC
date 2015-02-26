@@ -11,3 +11,4 @@ configure
 Makevars
 *.gcda
 *.gcno
+tests/testthat/*.pdf
