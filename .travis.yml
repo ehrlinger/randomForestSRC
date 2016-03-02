@@ -5,6 +5,8 @@
 #   https://github.com/craigcitro/r-travis/wiki
 
 language: r
+sudo: false
+cache: packages
 
 # For code coverage
 r_github_packages:
@@ -12,7 +14,7 @@ r_github_packages:
 
 after_success:
   - Rscript -e 'covr::coveralls()'
-  
+
 notifications:
   email:
     on_success: change
