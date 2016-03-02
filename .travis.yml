@@ -20,7 +20,6 @@ r_packages:
  - pec
  - covr
 
-
 # For code coverage
 # r_github_packages:
 #  - jimhester/covr
