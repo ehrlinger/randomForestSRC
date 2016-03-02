@@ -1,5 +1,5 @@
 Package: randomForestSRC
-Version: 2.0.7
+Version: 2.0.7.999
 Date: 2016-01-15
 Title: Random Forests for Survival, Regression and Classification
         (RF-SRC)

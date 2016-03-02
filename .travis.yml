@@ -10,7 +10,6 @@ cache: packages
 
 # Suggests
 r_packages:
- - pec
  - parallel
  - glmnet
  - XML
@@ -18,6 +17,8 @@ r_packages:
  - prodlim
  - Hmisc
  - mlbench
+ - pec
+
 
 # For code coverage
 r_github_packages:
