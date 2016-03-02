@@ -1,5 +1,10 @@
+[![CRAN version](http://www.r-pkg.org/badges/version/randomForestSRC)](http://cran.r-project.org/web/packages/randomForestSRC)
+![cranlogs](http://cranlogs.r-pkg.org./badges/randomForestSRC)
+
+![active](http://www.repostatus.org/badges/latest/active.svg)
 [![Build Status](https://travis-ci.org/ehrlinger/randomForestSRC.svg?branch=master)](https://travis-ci.org/ehrlinger/randomForestSRC)
 [![Coverage Status](https://coveralls.io/repos/ehrlinger/randomForestSRC/badge.svg)](https://coveralls.io/r/ehrlinger/randomForestSRC)
+
 
 # randomForestSRC: 
 
