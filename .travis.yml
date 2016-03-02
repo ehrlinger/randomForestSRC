@@ -18,11 +18,12 @@ r_packages:
  - Hmisc
  - mlbench
  - pec
+ - covr
 
 
 # For code coverage
-r_github_packages:
-  - jimhester/covr
+# r_github_packages:
+#  - jimhester/covr
 
 after_success:
   - Rscript -e 'covr::coveralls()'
