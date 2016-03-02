@@ -8,6 +8,17 @@ language: r
 sudo: false
 cache: packages
 
+# Suggests
+r_packages:
+ - pec
+ - parallel
+ - glmnet
+ - XML
+ - survival
+ - prodlim
+ - Hmisc
+ - mlbench
+
 # For code coverage
 r_github_packages:
   - jimhester/covr
