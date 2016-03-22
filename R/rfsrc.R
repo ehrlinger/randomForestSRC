@@ -2,13 +2,13 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.7 (_PROJECT_BUILD_ID_)
+####  Version 2.0.10 (_PROJECT_BUILD_ID_)
 ####
-####  Copyright 2015, University of Miami
+####  Copyright 2016, University of Miami
 ####
 ####  This program is free software; you can redistribute it and/or
 ####  modify it under the terms of the GNU General Public License
-####  as published by the Free Software Foundation; either version 2
+####  as published by the Free Software Foundation; either version 3
 ####  of the License, or (at your option) any later version.
 ####
 ####  This program is distributed in the hope that it will be useful,
@@ -45,7 +45,7 @@
 ####    --------------------------------------------------------------
 ####    Udaya B. Kogalur, Ph.D.
 ####    Adjunct Staff
-####    Dept of Quantitative Health Sciences
+####    Department of Quantitative Health Sciences
 ####    Cleveland Clinic Foundation
 ####    
 ####    Kogalur & Company, Inc.
@@ -70,7 +70,7 @@ rfsrc <- function(formula,
                   splitrule = NULL,
                   nsplit = 0,
                   split.null = FALSE,
-                  importance = c("permute", "random", "anti", "permute.ensemble", "random.ensemble", "anti.ensemble", "none"),
+                  importance = c("permute", "random", "anti", "permute.ensemble", "random.ensemble", "anti.ensemble", "none")[7],
                   na.action = c("na.omit", "na.impute", "na.random"),
                   nimpute = 1,
                   ntime,
@@ -381,7 +381,7 @@ rfsrc <- function(formula,
                        bootstrap = bootstrap,
                        fast.restore.bits = fast.restore.bits,
                        nativeArrayTNDS = nativeArrayTNDS,
-                       version = "2.0.7",
+                       version = "2.0.10",
                        na.action = na.action,
                        coerce.factor = coerce.factor)
     if (grepl("surv", family)) {

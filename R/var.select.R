@@ -2,13 +2,13 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.7 (_PROJECT_BUILD_ID_)
+####  Version 2.0.10 (_PROJECT_BUILD_ID_)
 ####
-####  Copyright 2015, University of Miami
+####  Copyright 2016, University of Miami
 ####
 ####  This program is free software; you can redistribute it and/or
 ####  modify it under the terms of the GNU General Public License
-####  as published by the Free Software Foundation; either version 2
+####  as published by the Free Software Foundation; either version 3
 ####  of the License, or (at your option) any later version.
 ####
 ####  This program is distributed in the hope that it will be useful,
@@ -45,7 +45,7 @@
 ####    --------------------------------------------------------------
 ####    Udaya B. Kogalur, Ph.D.
 ####    Adjunct Staff
-####    Dept of Quantitative Health Sciences
+####    Department of Quantitative Health Sciences
 ####    Cleveland Clinic Foundation
 ####    
 ####    Kogalur & Company, Inc.
@@ -106,7 +106,8 @@ var.select.rfsrc <-
                                nodesize = nodesize,
                                cause = cause,
                                na.action = na.action,
-                               do.trace = do.trace)
+                               do.trace = do.trace,
+                               importance="permute")
     if (rfsrc.filter.obj$family == "surv-CR") {
       target.dim <- max(1, min(cause, max(get.event.info(rfsrc.filter.obj)$event.type)), na.rm = TRUE)
     }
@@ -296,7 +297,8 @@ var.select.rfsrc <-
                                  splitrule = splitrule,
                                  nsplit = prefit$nsplit,
                                  cause = cause,
-                                 na.action = na.action)
+                                 na.action = na.action,
+                                 importance="permute")
       if (rfsrc.prefit.obj$family == "surv-CR") {
         target.dim <- max(1, min(cause, max(get.event.info(rfsrc.prefit.obj)$event.type)), na.rm = TRUE)
       }
@@ -335,7 +337,8 @@ var.select.rfsrc <-
                            cause = cause,
                            na.action = na.action,
                            do.trace = do.trace,
-                           xvar.wt = xvar.wt)
+                           xvar.wt = xvar.wt,
+                           importance="permute")
         if (rfsrc.obj$family == "surv-CR") {
           target.dim <- max(1, min(cause, max(get.event.info(rfsrc.obj)$event.type)), na.rm = TRUE)
         }
@@ -466,7 +469,8 @@ var.select.rfsrc <-
                                    nsplit = prefit$nsplit,
                                    cause = cause,
                                    splitrule = splitrule,
-                                   na.action = na.action)
+                                   na.action = na.action,
+                                   importance = "permute")
         if (rfsrc.prefit.obj$family == "surv-CR") {
           target.dim <- max(1, min(cause, max(get.event.info(rfsrc.prefit.obj)$event.type)), na.rm = TRUE)
         }

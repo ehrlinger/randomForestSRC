@@ -2,13 +2,13 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.7 (_PROJECT_BUILD_ID_)
+####  Version 2.0.10 (_PROJECT_BUILD_ID_)
 ####
-####  Copyright 2015, University of Miami
+####  Copyright 2016, University of Miami
 ####
 ####  This program is free software; you can redistribute it and/or
 ####  modify it under the terms of the GNU General Public License
-####  as published by the Free Software Foundation; either version 2
+####  as published by the Free Software Foundation; either version 3
 ####  of the License, or (at your option) any later version.
 ####
 ####  This program is distributed in the hope that it will be useful,
@@ -45,7 +45,7 @@
 ####    --------------------------------------------------------------
 ####    Udaya B. Kogalur, Ph.D.
 ####    Adjunct Staff
-####    Dept of Quantitative Health Sciences
+####    Department of Quantitative Health Sciences
 ####    Cleveland Clinic Foundation
 ####    
 ####    Kogalur & Company, Inc.
@@ -79,6 +79,8 @@ generic.predict.rfsrc <-
              ...)
 {
     univariate.nomenclature = TRUE
+    user.option <- list(...)
+    ptn.count <- is.hidden.ptn.count(user.option)
     if (missing(object)) {
         stop("object is missing!")
     }
@@ -147,17 +149,17 @@ generic.predict.rfsrc <-
     if (is.null(object$version)) {
       cat("\n  This function only works with objects created with this version of the package:")
       cat("\n    Installed version:  ")
-      cat("2.0.7")
+      cat("2.0.10")
       cat("\n    Object version:     ")
       cat("unknown")
       cat("\n")
       stop()
     }
     else {
-      if (substring(object$version, 1, 2) != substring("2.0.7", 1, 2)) {
+      if (substring(object$version, 1, 2) != substring("2.0.10", 1, 2)) {
         cat("\n  This function only works with objects created with this major version of the package:")
         cat("\n    Installed version:  ")
-        cat("2.0.7")
+        cat("2.0.10")
         cat("\n    Object version:     ")
         cat(object$version)
         cat("\n")
@@ -182,6 +184,9 @@ generic.predict.rfsrc <-
       outcome <- "train"
       perf.flag <- FALSE
       importance <- "none"
+    }
+    if (grepl("surv", family)) {
+      ptn.count <- 0
     }
     if (!grow.equivalent) {
         if (!partial.class) {
@@ -365,6 +370,7 @@ generic.predict.rfsrc <-
                                     as.character(xvar.types),
                                     as.integer(xvar.nlevels),
                                     as.double(xvar),
+                                    as.integer(ptn.count),
                                     as.integer(length(subset)),
                                     as.integer(subset),
                                     as.integer(n.newdata),
@@ -463,10 +469,18 @@ generic.predict.rfsrc <-
         else {
             inbag.out <- NULL
         }
+        if (ptn.count > 0) {
+            ptn.membership.out <- matrix(nativeOutput$ptnMembership, c(n.observed, ntree))
+            nativeOutput$ptnMembership <- NULL
+        }
+        else {
+            ptn.membership.out <- NULL
+        }
     }
     else {
         membership.out <- NULL
         inbag.out <- NULL
+        ptn.membership.out <- NULL
     }
     if (var.used != FALSE) {
         if (var.used == "all.trees") {
@@ -515,6 +529,7 @@ generic.predict.rfsrc <-
         leaf.count = nativeOutput$leafCount,
         proximity = proximity.out,
         forest = object,
+        ptn.membership = ptn.membership.out,
         membership = membership.out,
         splitrule = splitrule,
         inbag = inbag.out,
@@ -527,6 +542,7 @@ generic.predict.rfsrc <-
     nativeOutput$leafCount <- NULL
     remove(object)
     remove(proximity.out)
+    remove(ptn.membership.out)
     remove(membership.out)
     remove(inbag.out)
     if (n.miss > 0) remove(imputed.indv)
