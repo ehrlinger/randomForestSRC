@@ -4,7 +4,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 2.0.10 (bld20160309)
+////  Version 2.1.0 (bld20160317)
 ////
 ////  Copyright 2016, University of Miami
 ////
@@ -910,6 +910,7 @@ void free_dmatrix4(double ****v, unsigned long n4l, unsigned long n4h, unsigned 
 }
 void *new_vvector(unsigned long nl, unsigned long nh, enum alloc_type type) {
   void *v;
+  v = NULL;  
   switch(type){
   case NRUTIL_DPTR:
     v = ((double **) gvector(nl, nh, sizeof(double*)) -nl+NR_END);
@@ -3080,7 +3081,8 @@ void stackFactorGeneric(uint    size,
     for (i = 1; i <= size; i++) {
       (*p_factorMap)[i]    = 0;
       (*p_nonfactorMap)[i] = 0;
-      if (strcmp(type[i], "C") == 0) {
+      if ((strcmp(type[i], "C") == 0) ||
+          (strcmp(type[i], "I") == 0)) {
         (*factorCount) ++;
         (*p_factorMap)[i] = *factorCount;
       }
@@ -3607,13 +3609,15 @@ void stackMissingSignatures(uint     obsSize,
   *pRF_mrFactorSize = *pRF_mxFactorSize = 0;
   for (p = 1; p <= *p_pIndexSize; p++) {
     if ((*p_pIndex)[p] < 0) {
-      if (strcmp(RF_rType[(uint) abs((*p_pIndex)[p])], "C") == 0) {
+      if ((strcmp(RF_rType[(uint) abs((*p_pIndex)[p])], "C") == 0) ||
+          (strcmp(RF_rType[(uint) abs((*p_pIndex)[p])], "I") == 0)) {
         (*pRF_mrFactorSize) ++;
         (*pRF_mrFactorIndex)[*pRF_mrFactorSize] = (uint) abs((*p_pIndex)[p]);
       }
     }
     else {
-      if (strcmp(RF_xType[(*p_pIndex)[p]], "C") == 0) {
+      if ((strcmp(RF_xType[(*p_pIndex)[p]], "C") == 0) ||
+          (strcmp(RF_xType[(*p_pIndex)[p]], "I") == 0)) {
         (*pRF_mxFactorSize) ++;
         (*pRF_mxFactorIndex)[*pRF_mxFactorSize] = (*p_pIndex)[p];
       }
@@ -4841,7 +4845,8 @@ uint stackDefinedOutputObjects(char      mode,
             Rprintf("\nRF-SRC:  The application will now exit.\n");
             error("\nRF-SRC:  The application will now exit.\n");
           }
-          if (strcmp(RF_rType[RF_rTarget[i]], "C") == 0) {
+          if ((strcmp(RF_rType[RF_rTarget[i]], "C") == 0) || 
+              (strcmp(RF_rType[RF_rTarget[i]], "I") == 0)) {
             RF_rTargetFactor[++RF_rTargetFactorCount] = RF_rTarget[i];
           }
           else {
@@ -4946,7 +4951,8 @@ uint stackDefinedOutputObjects(char      mode,
             Rprintf("\nRF-SRC:  The application will now exit.\n");
             error("\nRF-SRC:  The application will now exit.\n");
           }
-          if (strcmp(RF_rType[RF_rTarget[i]], "C") == 0) {
+          if ((strcmp(RF_rType[RF_rTarget[i]], "C") == 0) ||
+              (strcmp(RF_rType[RF_rTarget[i]], "I") == 0)) {
             RF_rTargetFactor[++RF_rTargetFactorCount] = RF_rTarget[i];
           }
           else {
@@ -8813,7 +8819,8 @@ char unsupervisedSplit (uint    treeID,
         }
         for (r = 1; r <= RF_randomResponseCount; r++) {
           if (impurity[r]) {
-            if (strcmp(RF_xType[pseudoResponse[r]], "C") == 0) {
+            if ((strcmp(RF_xType[pseudoResponse[r]], "C") == 0) ||
+                (strcmp(RF_xType[pseudoResponse[r]], "I") == 0)) {
               pseudoResponseClassSize[r] = RF_xFactorSize[RF_xFactorMap[pseudoResponse[r]]];
               parentClassProp[r] = uivector(1, pseudoResponseClassSize[r]);
               leftClassProp[r]   = uivector(1, pseudoResponseClassSize[r]);
@@ -8854,7 +8861,8 @@ char unsupervisedSplit (uint    treeID,
           }
           for (r = 1; r <= RF_randomResponseCount; r++) {
             if (impurity[r]) {
-              if (strcmp(RF_xType[pseudoResponse[r]], "C") == 0) {
+              if ((strcmp(RF_xType[pseudoResponse[r]], "C") == 0) ||
+                  (strcmp(RF_xType[pseudoResponse[r]], "I") == 0)) {
                 for (p = 1; p <= pseudoResponseClassSize[r]; p++) {
                   rghtClassProp[r][p] = parentClassProp[r][p];
                   leftClassProp[r][p] = 0;
@@ -8901,7 +8909,8 @@ char unsupervisedSplit (uint    treeID,
             }
             if (impurity[r]) {
               if (factorFlag == TRUE) {
-                if (strcmp(RF_xType[pseudoResponse[r]], "C") == 0) {
+                if ((strcmp(RF_xType[pseudoResponse[r]], "C") == 0) ||
+                    (strcmp(RF_xType[pseudoResponse[r]], "I") == 0)) {
                   for (p = 1; p <= pseudoResponseClassSize[r]; p++) {
                     leftClassProp[r][p] = 0;
                   }
@@ -8938,7 +8947,8 @@ char unsupervisedSplit (uint    treeID,
               else {
                 for (k = priorMembrIter + 1; k < currentMembrIter; k++) {
                   if (secondNonMissMembrFlag[r][k] == TRUE) {
-                    if (strcmp(RF_xType[pseudoResponse[r]], "C") == 0) {
+                    if ((strcmp(RF_xType[pseudoResponse[r]], "C") == 0) ||
+                        (strcmp(RF_xType[pseudoResponse[r]], "I") == 0)) {
                       leftClassProp[r][(uint) RF_observation[treeID][pseudoResponse[r]][ repMembrIndx[nonMissMembrIndx[indxx[k]]] ]] ++;
                       rghtClassProp[r][(uint) RF_observation[treeID][pseudoResponse[r]][ repMembrIndx[nonMissMembrIndx[indxx[k]]] ]] --;
                     }
@@ -8953,7 +8963,8 @@ char unsupervisedSplit (uint    treeID,
               }  
               if ((secondNonMissMembrLeftSize[r] > 0) && (secondNonMissMembrRghtSize[r] > 0)) {
                 deltaNorm ++;
-                if (strcmp(RF_xType[pseudoResponse[r]], "C") == 0) {
+                if ((strcmp(RF_xType[pseudoResponse[r]], "C") == 0) ||
+                    (strcmp(RF_xType[pseudoResponse[r]], "I") == 0)) {
                   sumLeft[1] = sumRght[1] = 0;
                   for (p = 1; p <= pseudoResponseClassSize[r]; p++) {
                     sumLeft[1] += (double) upower(leftClassProp[r][p], 2);
@@ -9006,7 +9017,8 @@ char unsupervisedSplit (uint    treeID,
                            permissibleSplitPtr);
         for (r = 1; r <= RF_randomResponseCount; r++) {
           if (impurity[r]) {
-            if (strcmp(RF_xType[pseudoResponse[r]], "C") == 0) {
+            if ((strcmp(RF_xType[pseudoResponse[r]], "C") == 0) ||
+                (strcmp(RF_xType[pseudoResponse[r]], "I") == 0)) {
               free_uivector (parentClassProp[r], 1, pseudoResponseClassSize[r]);
               free_uivector (leftClassProp[r],   1, pseudoResponseClassSize[r]);
               free_uivector (rghtClassProp[r],   1, pseudoResponseClassSize[r]);
@@ -9176,7 +9188,8 @@ char multivariateSplit (uint    treeID,
       uint  *secondNonMissMembrRghtSize =       uivector(1, RF_rSize);
       for (r = 1; r <= RF_rSize; r++) {
         parentClassProp[r] = leftClassProp[r] = rghtClassProp[r] = NULL;
-        if (strcmp(RF_rType[r], "C") == 0) {
+        if ((strcmp(RF_rType[r], "C") == 0) ||
+            (strcmp(RF_rType[r], "I") == 0)) {
           parentClassProp[r] = uivector(1, RF_classLevelSize[RF_rFactorMap[r]]);
           leftClassProp[r]   = uivector(1, RF_classLevelSize[RF_rFactorMap[r]]);
           rghtClassProp[r]   = uivector(1, RF_classLevelSize[RF_rFactorMap[r]]);
@@ -9268,7 +9281,8 @@ char multivariateSplit (uint    treeID,
           }
           for (r = 1; r <= RF_rSize; r++) {
             if (impurity[r]) {
-              if (strcmp(RF_rType[r], "C") == 0) {
+              if ((strcmp(RF_rType[r], "C") == 0) ||
+                  (strcmp(RF_rType[r], "I") == 0)) {
                 for (p=1; p <= RF_classLevelSize[RF_rFactorMap[r]]; p++) {
                   parentClassProp[r][p] = 0;
                 }
@@ -9305,7 +9319,8 @@ char multivariateSplit (uint    treeID,
             }
             for (r = 1; r <= RF_rSize; r++) {
               if (impurity[r]) {
-                if (strcmp(RF_rType[r], "C") == 0) {
+                if ((strcmp(RF_rType[r], "C") == 0) ||
+                    (strcmp(RF_rType[r], "I") == 0)) {
                   for (p=1; p <= RF_classLevelSize[RF_rFactorMap[r]]; p++) {
                     rghtClassProp[r][p] = parentClassProp[r][p];
                     leftClassProp[r][p] = 0;
@@ -9349,7 +9364,8 @@ char multivariateSplit (uint    treeID,
             for (r = 1; r <= RF_rSize; r++) {
               if (impurity[r]) {
                 if (factorFlag == TRUE) {
-                  if (strcmp(RF_rType[r], "C") == 0) {
+                  if ((strcmp(RF_rType[r], "C") == 0) ||
+                      (strcmp(RF_rType[r], "I") == 0)) {
                     for (p=1; p <= RF_classLevelSize[RF_rFactorMap[r]]; p++) {
                       leftClassProp[r][p] = 0;
                     }
@@ -9386,7 +9402,8 @@ char multivariateSplit (uint    treeID,
                 else {
                   for (k = priorMembrIter + 1; k < currentMembrIter; k++) {
                     if (secondNonMissMembrFlag[r][k] == TRUE) {
-                      if (strcmp(RF_rType[r], "C") == 0) {
+                      if ((strcmp(RF_rType[r], "C") == 0) ||
+                          (strcmp(RF_rType[r], "I") == 0)) {
                         leftClassProp[r][RF_classLevelIndex[RF_rFactorMap[r]][(uint) RF_response[treeID][r][ repMembrIndx[nonMissMembrIndx[indxx[k]]] ]]] ++;
                         rghtClassProp[r][RF_classLevelIndex[RF_rFactorMap[r]][(uint) RF_response[treeID][r][ repMembrIndx[nonMissMembrIndx[indxx[k]]] ]]] --;
                       }
@@ -9401,7 +9418,8 @@ char multivariateSplit (uint    treeID,
                 }  
                 if ((secondNonMissMembrLeftSize[r] > 0) && (secondNonMissMembrRghtSize[r] > 0)) {
                   deltaNorm ++;
-                  if (strcmp(RF_rType[r], "C") == 0) {
+                  if ((strcmp(RF_rType[r], "C") == 0) ||
+                      (strcmp(RF_rType[r], "I") == 0)) {
                     partialLeft = partialRght = 0;
                     for (p = 1; p <= RF_classLevelSize[RF_rFactorMap[r]]; p++) {
                       partialLeft += (double) upower(leftClassProp[r][p], 2);
@@ -9470,7 +9488,8 @@ char multivariateSplit (uint    treeID,
         }
       }  
       for (r = 1; r <= RF_rSize; r++) {
-        if (strcmp(RF_rType[r], "C") == 0) {
+        if ((strcmp(RF_rType[r], "C") == 0) ||
+            (strcmp(RF_rType[r], "I") == 0)) {
           free_uivector (parentClassProp[r], 1, RF_classLevelSize[RF_rFactorMap[r]]);
           free_uivector (leftClassProp[r], 1, RF_classLevelSize[RF_rFactorMap[r]]);
           free_uivector (rghtClassProp[r], 1, RF_classLevelSize[RF_rFactorMap[r]]);
@@ -9780,7 +9799,8 @@ char customMultivariateSplit (uint    treeID,
                     }
                   }
                   deltaNorm ++;
-                  if (strcmp(RF_rType[r], "C") == 0) {
+                  if ((strcmp(RF_rType[r], "C") == 0) ||
+                      (strcmp(RF_rType[r], "I") == 0)) {
                     deltaPartial = customFunctionArray[CLAS_FAM][RF_splitCustomIdx](m,
                                                                                     userSplitIndicator,
                                                                                     NULL,
@@ -11471,7 +11491,8 @@ void getMeanResponse(uint treeID) {
 }
 void updateEnsembleMean(uint     mode,
                         uint     treeID,
-                        uint     serialTreeID) {
+                        uint     serialTreeID,
+                        char     omitDenominator) {
   char oobFlag, fullFlag, selectionFlag, outcomeFlag;
   Terminal ***termMembershipPtr;
   uint    *membershipIndex;
@@ -11544,7 +11565,9 @@ void updateEnsembleMean(uint     mode,
         for (j=1; j <= RF_rTargetNonFactorCount; j++) {
           ensembleRGRnum[j][ii] += (parent -> meanResponse)[RF_rNonFactorMap[RF_rTargetNonFactor[j]]];
         }
-        ensembleDen[ii] ++;
+        if(!omitDenominator) {
+          ensembleDen[ii] ++;
+        }
       }
       if (outcomeFlag == TRUE) {
         if (ensembleDen[ii] != 0) {
@@ -11722,7 +11745,8 @@ void getMultiClassProb (uint treeID) {
 }
 void updateEnsembleMultiClass(uint      mode,
                               uint      treeID,
-                              uint      serialTreeID) {
+                              uint      serialTreeID,
+                              char     omitDenominator) {
   char oobFlag, fullFlag, selectionFlag, outcomeFlag;
   Terminal ***termMembershipPtr;
   uint    *membershipIndex;
@@ -11799,7 +11823,9 @@ void updateEnsembleMultiClass(uint      mode,
             ensembleCLSnum[j][k][ii] += (double) (parent -> multiClassProb)[RF_rFactorMap[RF_rTargetFactor[j]]][k] / (double) (parent -> membrCount);
           }
         }
-        ensembleDen[ii] ++;
+        if(!omitDenominator) {
+          ensembleDen[ii] ++;
+        }
       }
       if (outcomeFlag == TRUE) {
         if (ensembleDen[ii] != 0) {
@@ -16002,13 +16028,15 @@ void updateEnsembleCalculations (char      multipleImputeFlag,
                                  uint      b) {
   uint      obsSize;
   double  **responsePtr;
+  char      potentiallyMixedMultivariate;
   char      respImputeFlag;
   uint      thisSerialTreeCount;
   uint      j;
-  respImputeFlag       = FALSE; 
-  responsePtr          = NULL;  
-  obsSize              = 0;     
-  thisSerialTreeCount  = 0;     
+  potentiallyMixedMultivariate = FALSE;  
+  respImputeFlag       = FALSE;  
+  responsePtr          = NULL;   
+  obsSize              = 0;      
+  thisSerialTreeCount  = 0;      
   if (mode == RF_GROW) {
     updateTerminalNodeOutcomes(b);
   }
@@ -16032,11 +16060,14 @@ void updateEnsembleCalculations (char      multipleImputeFlag,
         updateEnsembleSurvival(mode, b, thisSerialTreeCount);
       }  
       else {
+        potentiallyMixedMultivariate = FALSE;
         if (RF_rTargetFactorCount > 0) {
-          updateEnsembleMultiClass(mode, b, thisSerialTreeCount);
+          updateEnsembleMultiClass(mode, b, thisSerialTreeCount, potentiallyMixedMultivariate);
+          potentiallyMixedMultivariate = TRUE;
         }
         if (RF_rTargetNonFactorCount > 0) {
-          updateEnsembleMean(mode, b, thisSerialTreeCount);
+          updateEnsembleMean(mode, b, thisSerialTreeCount, potentiallyMixedMultivariate);
+          potentiallyMixedMultivariate = TRUE;
         }
       }
       if (getPerformanceFlag(mode, thisSerialTreeCount)) {
@@ -17576,7 +17607,7 @@ SEXP rfsrc(char mode, int seedValue, uint traceFlag) {
     break;
   }
   initializeTimeArrays(mode);
-  stackFactorArrays(mode);
+  stackFactorArrays();
   stackMissingArrays(mode);
   if (RF_statusIndex > 0) {
     stackCompetingArrays(mode);

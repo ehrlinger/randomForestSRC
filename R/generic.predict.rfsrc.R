@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.10 (_PROJECT_BUILD_ID_)
+####  Version 2.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -64,7 +64,7 @@ generic.predict.rfsrc <-
     function(object,
              newdata,
              outcome.target = NULL, 
-             importance = c("permute", "random", "anti", "permute.ensemble", "random.ensemble", "anti.ensemble", "none"),
+             importance = c(FALSE, TRUE, "none", "permute", "random", "anti", "permute.ensemble", "random.ensemble", "anti.ensemble"),
              importance.xvar,
              subset = NULL,
              na.action = c("na.omit", "na.impute", "na.random"),
@@ -95,12 +95,11 @@ generic.predict.rfsrc <-
     else {
         partial.class <- TRUE
     }
-    importance <- match.arg(importance[1],
-                            c("permute", "random", "anti",
-                              "permute.ensemble", "random.ensemble", "anti.ensemble",
-                              "permute.joint", "random.joint", "anti.joint",
-                              "permute.joint.ensemble", "random.joint.ensemble", "anti.joint.ensemble",
-                              "none"))
+    importance <- match.arg(as.character(importance), c(FALSE, TRUE,
+                                          "none", "permute", "random", "anti",
+                                          "permute.ensemble", "random.ensemble", "anti.ensemble",
+                                          "permute.joint", "random.joint", "anti.joint",
+                                          "permute.joint.ensemble", "random.joint.ensemble", "anti.joint.ensemble"))
     if (grepl("joint", importance)) {
         vimp.joint <- TRUE
     }
@@ -149,17 +148,17 @@ generic.predict.rfsrc <-
     if (is.null(object$version)) {
       cat("\n  This function only works with objects created with this version of the package:")
       cat("\n    Installed version:  ")
-      cat("2.0.10")
+      cat("2.1.0")
       cat("\n    Object version:     ")
       cat("unknown")
       cat("\n")
       stop()
     }
     else {
-      if (substring(object$version, 1, 2) != substring("2.0.10", 1, 2)) {
+      if (substring(object$version, 1, 2) != substring("2.1.0", 1, 2)) {
         cat("\n  This function only works with objects created with this major version of the package:")
         cat("\n    Installed version:  ")
-        cat("2.0.10")
+        cat("2.1.0")
         cat("\n    Object version:     ")
         cat(object$version)
         cat("\n")
@@ -673,36 +672,41 @@ generic.predict.rfsrc <-
         }
     }
     else {
-      class.index <- which(yvar.types == "C")
-      class.factor.index <- which(yfactor$generic.types == "C")
+      class.index <- which(yvar.types != "R")
       class.count <- length(class.index)
-      regr.index <- which(yvar.types != "C")
+      regr.index <- which(yvar.types == "R")
       regr.count <- length(regr.index)
       if (class.count > 0) {
         classOutput <- vector("list", class.count)
         names(classOutput) <- yvar.names[class.index]
         levels.count <- array(0, class.count)
         levels.names <- vector("list", class.count)
-        counter <-  counter.factor <- 0
+        counter <- 0
         for (i in class.index) {
-          counter <- counter + 1
-          levels.count[counter] <- yvar.nlevels[i]
-          if (is.element(i, class.factor.index)) {
-            counter.factor <- counter.factor + 1
-            levels.names[[counter]] <- yfactor$levels[[counter.factor]]
-          }
-          else {
-            levels.names[[counter]] <- paste(sort(unique(object$yvar[, i])))
-          }
+            counter <- counter + 1
+            levels.count[counter] <- yvar.nlevels[i]
+            if (yvar.types[i] == "C") {
+              levels.names[[counter]] <- yfactor$levels[[which(yfactor$factor == yvar.names[i])]]
+            }
+              else {
+                levels.names[[counter]] <- yfactor$order.levels[[which(yfactor$order == yvar.names[i])]]
+              }
         }
         tree.offset <- array(1, ntree)
         if (ntree > 1) {
-          tree.offset[2:ntree] <- sum(1 + levels.count)
+          levels.total <- 0 
+          for (i in 1:length(outcome.target.idx)) {
+            target.idx <- which (class.index == outcome.target.idx[i])
+            if (length(target.idx) > 0) {
+              levels.total <- levels.total + levels.count[target.idx]
+            }
+          }
+          tree.offset[2:ntree] <- 1 + levels.total
         }
         tree.offset <-  cumsum(tree.offset)
         vimp.offset <- array(1, vimp.count)
         if (vimp.count > 1) {
-          vimp.offset[2:vimp.count] <- sum(1 + levels.count)
+          vimp.offset[2:vimp.count] <- levels.total
         }
         vimp.offset <-  cumsum(vimp.offset)
         iter.ensb.start <- 0

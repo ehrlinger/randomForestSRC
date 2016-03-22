@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.10 (_PROJECT_BUILD_ID_)
+####  Version 2.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -211,6 +211,9 @@ var.select.rfsrc <-
       }
       rfsrc.all.f <- formula
     }
+  if (!missing(object)) {
+    outcome.target <- coerce.multivariate.target(object, outcome.target)
+  }
   if (missing(object)) {
     formulaDetail <- finalizeFormula(parseFormula(rfsrc.all.f, data), data)
     family <- formulaDetail$family
@@ -307,6 +310,8 @@ var.select.rfsrc <-
         xvar.wt <- get.grow.xvar.wt(wts, P)
       }
       rm(rfsrc.prefit.obj)
+    }
+    if (!missing(object)) {
     }
     if (!missing(object) && !prefit.flag) {
       if (verbose) cat("minimal depth variable selection ...\n")

@@ -34,8 +34,8 @@ rfsrc(formula, data, ntree = 1000,
   splitrule = NULL,
   nsplit = 0,
   split.null = FALSE,
-  importance = c("permute", "random", "anti", "permute.ensemble",
-                 "random.ensemble", "anti.ensemble", "none")[7],
+  importance = c(FALSE, TRUE, "none", "permute", "random", "anti", 
+                 "permute.ensemble", "random.ensemble",  "anti.ensemble"),
   na.action = c("na.omit", "na.impute", "na.random"),
   nimpute = 1,
   ntime,
@@ -171,7 +171,7 @@ rfsrc(formula, data, ntree = 1000,
 	  aware that this option uses significantly more RAM when the data set
 	  is large, ntree is large, and the nodesize is small.  This is
 	  especially the case when survival or competing risk forests are
-	  grown.  Alos, grow times will certainly be increased due to the cost
+	  grown.  Also, grow times will certainly be increased due to the cost
 	  of saving terminal node information.  Depending on your situation,
 	  no decrease in elapsed CPU time may occur during restoration.  In
 	  fact, elapsed restore time may increase when running in parallel,

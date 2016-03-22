@@ -2,7 +2,7 @@
 ////**********************************************************************
 ////
 ////  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-////  Version 2.0.10 (bld20160309)
+////  Version 2.1.0 (bld20160317)
 ////
 ////  Copyright 2016, University of Miami
 ////
@@ -1131,7 +1131,8 @@ void updateNodeStatistics(Node *parent, double delta, uint candidateCovariateCou
 void getMeanResponse(uint treeID);
 void updateEnsembleMean(uint     mode,
                         uint     treeID,
-                        uint     serialTreeID);
+                        uint     serialTreeID,
+                        char     omitDenominator);
 double getMeanSquareError(uint    size,
                           double *responsePtr,
                           double *predictedOutcome,
@@ -1145,9 +1146,10 @@ char getVariance(uint    repMembrSize,
                  double *variance);
 void restoreMeanResponse(uint treeID);
 void getMultiClassProb (uint treeID);
-void updateEnsembleMultiClass(uint      mode,
-                              uint      treeID,
-                              uint      serialTreeID);
+void updateEnsembleMultiClass(uint     mode,
+                              uint     treeID,
+                              uint     serialTreeID,
+                              char     omitDenominator);
 double getBrierScore(uint     obsSize,
                      uint     rTarget,
                      double  *responsePtr,

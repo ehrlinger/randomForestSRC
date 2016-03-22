@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.10 (_PROJECT_BUILD_ID_)
+####  Version 2.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -153,7 +153,12 @@ plot.variable.rfsrc <- function(
         event.info <- time <- NULL
         if (family == "class" || family == "class+" ||
             (family ==  "mix+" && is.factor.not.ordered(object$yvar[, outcome.target]))) {
-          object.yvar <- data.frame(object$yvar)[, outcome.target]
+          if (family == "class") {
+            object.yvar <- object$yvar
+          }
+            else {
+              object.yvar <- data.frame(object$yvar)[, outcome.target]
+            }
           if (missing(which.class)) {
             which.class <- 1
           }

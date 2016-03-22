@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  RANDOM FORESTS FOR SURVIVAL, REGRESSION, AND CLASSIFICATION (RF-SRC)
-####  Version 2.0.10 (_PROJECT_BUILD_ID_)
+####  Version 2.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -63,7 +63,7 @@
 vimp.rfsrc <- function(object,
                        xvar.names,
                        outcome.target = NULL,
-                       importance = c("permute", "random", "anti", "permute.ensemble", "random.ensemble", "anti.ensemble", "none"),
+                       importance = c("permute", "random", "anti", "permute.ensemble", "random.ensemble", "anti.ensemble"),
                        joint = FALSE,
                        subset,
                        seed = NULL,
@@ -92,12 +92,11 @@ vimp.rfsrc <- function(object,
         importance <- paste(i.str[1], ".joint.", i.str[2], sep = "")
       }
   }
-  importance <- match.arg(importance,
-                          c("permute", "random", "anti",
-                            "permute.ensemble", "random.ensemble", "anti.ensemble",
-                            "none", 
-                            "permute.joint", "random.joint", "anti.joint",
-                            "permute.joint.ensemble", "random.joint.ensemble", "anti.joint.ensemble"))
+  importance <- match.arg(importance, c(FALSE, TRUE,
+                                        "none", "permute", "random", "anti",
+                                        "permute.ensemble", "random.ensemble", "anti.ensemble",
+                                        "permute.joint", "random.joint", "anti.joint",
+                                        "permute.joint.ensemble", "random.joint.ensemble", "anti.joint.ensemble"))
   if (sum(inherits(object, c("rfsrc", "grow"), TRUE) == c(1, 2)) == 2) {
     if (is.null(object$forest)) {
       stop("The forest is empty.  Re-run rfsrc (grow) call with forest=TRUE")
