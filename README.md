@@ -8,7 +8,7 @@ randomForestSRC - Fast Unified Random Forests for Survival, Regression, and Clas
 [![active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/badges/latest/active.svg)
 
 [![R-CMD-check](https://github.com/ehrlinger/randomForestSRC/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/randomForestSRC/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/ehrlinger/ggRandomForests/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/ggRandomForests)
+
 
 <!-- badges: end -->
 
