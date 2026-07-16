@@ -181,7 +181,11 @@ SEXP rfsrcGrow(SEXP traceFlag,
     }
   }
   RF_xWeightStat          = REAL(xWeightStat);  RF_xWeightStat--;
-  RF_yWeight              = REAL(yWeight);  RF_yWeight--;
+  /* yvar.wt is NULL for the unsupervised family (rfsrc.R), so yWeight can be
+     zero length; REAL() then returns the empty-vector sentinel and the
+     decrement forms an out-of-bounds pointer (UB, flagged by UBSAN). It is
+     never read in that case, so the guard changes no behaviour. */
+  RF_yWeight              = REAL(yWeight);  if (XLENGTH(yWeight) > 0) RF_yWeight--;
   RF_xWeight              = REAL(xWeight);  RF_xWeight--;
   RF_timeInterestSize = INTEGER(VECTOR_ELT(timeInterest, 0))[0];
   if (VECTOR_ELT(timeInterest, 1) != R_NilValue) {
